@@ -6,7 +6,7 @@ use cosmwasm_std::Uint128;
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema)]
 pub struct InitialBalance {
     pub address: String,
-    pub amount: uint128,
+    pub amount: Uint128,
 }
 
 #[derive(Serialize, Deserialize, JsonSchema)]

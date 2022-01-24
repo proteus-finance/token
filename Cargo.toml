@@ -1,11 +1,11 @@
 [package]
-name = "cw-erc20"
-description = "An implementation of the ERC20 token interface"
+name = "proteus token"
+description = "proteus finance"
 version = "0.1.0"
-authors = ["Simon Warta <webmaster128@users.noreply.github.com>"]
-edition = "2018"
+authors = ["Mohsin Laeeque <mohsin.laeeque@arhamsoft.org>"]
+edition = "2022"
 license = "Apache-2.0"
-repository = "https://github.com/CosmWasm/cosmwasm-examples"
+repository = "https://github.com/proteus-finance/token"
 
 exclude = [
   # Those files are rust-optimizer artifacts. You might want to commit them for convenience but they should not be part of the source code publication.

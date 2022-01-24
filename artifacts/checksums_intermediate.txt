@@ -1,1 +1,0 @@
-ad0c18d5d617b246f975a27d006e2e34cd331a5fc617b4eb5ba75bcaae5b64c9  ./target/wasm32-unknown-unknown/release/cw_erc20.wasm
