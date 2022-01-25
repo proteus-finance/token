@@ -18,6 +18,9 @@ pub enum ContractError {
     #[error("Allowance is expired")]
     Expired {},
 
+    #[error("Invalid Amount Entered")]
+    Invalid {},
+
     #[error("No allowance for this account")]
     NoAllowance {},
 

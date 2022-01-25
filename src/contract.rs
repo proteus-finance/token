@@ -22,9 +22,13 @@ use crate::state::{MinterData, TokenInfo, BALANCES, LOGO, MARKETING_INFO, TOKEN_
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw20-base";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-
+//static NUM: i32 = 18;
+//static mut Total_seed: Uint128= Uint128::new(80000000);
+//static Total_seed: Uint128=80000000 as Uint128;
 const LOGO_SIZE_CAP: usize = 5 * 1024;
 
+// let TimeStart ;
+// let TimeEnd;
 /// Checks if data starts with XML preamble
 fn verify_xml_preamble(data: &[u8]) -> Result<(), ContractError> {
     // The easiest way to perform this check would be just match on regex, however regex
@@ -104,7 +108,7 @@ pub fn instantiate(
             return Err(StdError::generic_err("Initial supply greater than cap").into());
         }
     }
-
+    
     let mint = match msg.mint {
         Some(m) => Some(MinterData {
             minter: deps.api.addr_validate(&m.minter)?,
@@ -113,6 +117,16 @@ pub fn instantiate(
         None => None,
     };
 
+
+    let _seed_token_sale = (total_supply * Uint128::new(8))/Uint128::new(100);
+    let _ido = (total_supply * Uint128::new(4))/Uint128::new(100);
+    let _staking_funds = (total_supply * Uint128::new(25))/Uint128::new(100);
+    let _insurance_funds = (total_supply * Uint128::new(20))/Uint128::new(100);
+    let _team = (total_supply * Uint128::new(20))/Uint128::new(100);
+    let _advisors = (total_supply * Uint128::new(2))/Uint128::new(100);
+    let _launch_pad = (total_supply * Uint128::new(15))/Uint128::new(100);
+    let _liquidity = (total_supply * Uint128::new(6))/Uint128::new(100);
+
     // store token info
     let data = TokenInfo {
         name: msg.name,
@@ -120,6 +134,14 @@ pub fn instantiate(
         decimals: msg.decimals,
         total_supply,
         mint,
+        seed_token_sale: _seed_token_sale,
+        ido: _ido,
+        staking_funds: _staking_funds,
+        insurance_funds: _insurance_funds,
+        team: _team,
+        advisors: _advisors,
+        launch_pad: _launch_pad,
+        liquidity: _liquidity,
     };
     TOKEN_INFO.save(deps.storage, &data)?;
 
@@ -147,6 +169,8 @@ pub fn instantiate(
         };
         MARKETING_INFO.save(deps.storage, &data)?;
     }
+    // TimeStart=env.block.time.seconds();
+    // TimeEnd=env.block.time.seconds() + 23*30*24*60*60;
 
     Ok(Response::default())
 }
@@ -172,6 +196,9 @@ pub fn execute(
         ExecuteMsg::Transfer { recipient, amount } => {
             execute_transfer(deps, env, info, recipient, amount)
         }
+        // ExecuteMsg::Seed{ recipient, amount } => {
+        //     execute_seed(deps, env, info, recipient, amount)
+        // }
         ExecuteMsg::Burn { amount } => execute_burn(deps, env, info, amount),
         ExecuteMsg::Send {
             contract,
@@ -274,6 +301,30 @@ pub fn execute_burn(
         .add_attribute("amount", amount);
     Ok(res)
 }
+// pub fn execute_seed(
+//     deps: DepsMut,
+//     _env: Env,
+//     info: MessageInfo,
+//     recipient: String,
+//     amount: Uint128,
+// )-> Result<Response,ContractError>
+// {
+//     let mut info = TOKEN_INFO.load(deps.storage)?;
+//    // let current_time = _env.block.time.seconds();
+
+//     if amount ==Uint128::zero()
+//     {
+//         return Err(ContractError::InvalidZeroAmount {});
+//     }
+//     if amount>=info.seed
+//     {
+//         return Err(ContractError::Invalid {});
+//     }
+//     info.seed -= amount;
+    
+//     // execute_transfer(deps,_env,info,recipient,amount)
+// }
+
 
 pub fn execute_mint(
     deps: DepsMut,

@@ -1,9 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-
 use cosmwasm_std::{Addr, Uint128};
 use cw_storage_plus::{Item, Map};
-
 use cw20::{AllowanceResponse, Logo, MarketingInfoResponse};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -14,6 +12,14 @@ pub struct TokenInfo {
     pub decimals: u8,
     pub total_supply: Uint128,
     pub mint: Option<MinterData>,
+    pub seed_token_sale: Uint128,
+    pub ido: Uint128,
+    pub staking_funds: Uint128,
+    pub insurance_funds: Uint128,
+    pub team: Uint128,
+    pub advisors: Uint128,
+    pub launch_pad: Uint128,
+    pub liquidity: Uint128,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
