@@ -1,8 +1,8 @@
 <div align="center">
   <a href="https://proteus.finance/">
-    <img src="assets/logo.svg" alt="Logo" width="80" height="80">
+    <img src="assets/logo.svg" alt="Logo">
   </a>
-  <h3 align="center">Proteus Token</h3>
+  <h2 align="center">Proteus Token</h2>
 </div>
 
 this is cw 20 token Proteus Project. In which you can mint, transfer, and burn tokens.
