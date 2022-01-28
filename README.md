@@ -1,6 +1,6 @@
 <div align="center">
   <a align="center" href="https://proteus.finance/">
-    <img align="center" src="assets/logo.svg" alt="Logo" width="80" height="80">
+    <img align="center" src="assets/logo.svg" alt="Logo">
   </a>
   <h2 align="center">Proteus Token</h2>
 </div>
