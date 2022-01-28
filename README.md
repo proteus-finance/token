@@ -2,6 +2,7 @@
   <a align="left" href="https://proteus.finance/">
     <img align="left" src="assets/logo.svg" alt="Logo">
   </a>
+  <br/>
   <h2 align="left">Proteus Token</h2>
     <p>This is cw 20 token Proteus Project. In which you can mint, transfer, and burn tokens.</p>
     <p>This project also have different more functionalties in which seed,Liquidity,Staking,Launch Pad,Advisor,IDO,Insurance and team we will explain these functionalties and also how they work</p>
