@@ -1,48 +1,53 @@
-# CW20 Basic
+#**Proteus Token**
+this is cw 20 token Proteus Project. In which you can mint, transfer, and  burn tokens.
 
-This is a basic implementation of a cw20 contract. It implements
-the [CW20 spec](../../packages/cw20/README.md) and is designed to
-be deployed as is, or imported into other contracts to easily build
-cw20-compatible tokens with custom logic.
+this project also have different more functionalties in which seed,Liquidity,Staking,Launch Pad,Advisor,IDO,Insurance and team we will explain these functionalties and also how they work,
 
-Implements:
+**Seed**
+-> seed function ***have 8*** percent of token supply.
+-> seed function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String.
+-> seed function only will work after the three months of deployment of token.
+-> you can only do  ***5 percent*** of seeding every month.
+-> seed function will not work after 23 months of token deployment. 
 
-- [x] CW20 Base
-- [x] Mintable extension
-- [x] Allowances extension
+**IDO**
+-> IDO function ***have 4*** percent of token supply.
+-> IDO function will take two parameter one is amount thats will be in ***Uint128*** and address thats will be in String.
+-> IDO function will work from 6 to 8 momth .
 
-## Running this contract
+**Staking Fund**
+-> Staking function ***have 25*** percent of token supply.
+-> Staking function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String.
 
-You will need Rust 1.44.1+ with `wasm32-unknown-unknown` target installed.
+**Team**
+-> Team function ***have 20*** percent of token supply.
+-> Team function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String.
+-> every month only **10 percent amount** of 20 percent of token can be through teaming.
+-> Team function will not work after 23 months of token deployment.
+-> Team function only will work after the six months of deployment of token.
 
-You can run unit tests on this via: 
+**Advisor**
+-> Advisor function ***have 2*** percent of token supply.
+-> Advisor function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String.
+-> every month only **10 percent amount** of 2 percent of token can be through advising.
+-> Advisor function will not work after 13 months of token deployment.
+-> Advisor function only will work after the six months of deployment of token.
+ 
+**Launchpad**
+-> Launchpad function ***have 15*** percent of token supply.
+-> Launchpad function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String.
+-> every month only **10 percent amount** of 15 percent of token can be through advising.
+-> Launchpad function will not work after 16 months of token deployment.
+-> Launchpad function only will work after the six months of deployment of token.
 
-`cargo test`
+**Liquidity**
+-> Liquidity function ***have 6*** percent of token supply.
+-> Liquidity function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String
 
-Once you are happy with the content, you can compile it to wasm via:
 
-```
-RUSTFLAGS='-C link-arg=-s' cargo wasm
-cp ../../target/wasm32-unknown-unknown/release/cw20_base.wasm .
-ls -l cw20_base.wasm
-sha256sum cw20_base.wasm
-```
 
-Or for a production-ready (optimized) build, run a build command in the
-the repository root: https://github.com/CosmWasm/cw-plus#compiling.
 
-## Importing this contract
 
-You can also import much of the logic of this contract to build another
-ERC20-contract, such as a bonding curve, overiding or extending what you
-need.
 
-Basically, you just need to write your handle function and import 
-`cw20_base::contract::handle_transfer`, etc and dispatch to them.
-This allows you to use custom `ExecuteMsg` and `QueryMsg` with your additional
-calls, but then use the underlying implementation for the standard cw20
-messages you want to support. The same with `QueryMsg`. You *could* reuse `instantiate`
-as it, but it is likely you will want to change it. And it is rather simple.
 
-Look at [`cw20-staking`](../cw20-staking/README.md) for an example of how to "inherit"
-all this token functionality and combine it with custom logic.
+
