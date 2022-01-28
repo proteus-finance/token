@@ -1,9 +1,12 @@
-#**Proteus Token**
+![Proteus logo](./assets/logo.svg)  
+# Proteus Token
+
+## Proteus Token
 this is cw 20 token Proteus Project. In which you can mint, transfer, and  burn tokens.
 
 this project also have different more functionalties in which seed,Liquidity,Staking,Launch Pad,Advisor,IDO,Insurance and team we will explain these functionalties and also how they work,
 
-**Seed**
+## Seed
 
 seed function ***have 8*** percent of token supply
 seed function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String
