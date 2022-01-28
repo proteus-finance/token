@@ -31,7 +31,20 @@ pub struct TokenInfo {
     pub next_month_advisor:u64,
     pub end_month_advisor:u64,
     pub monthly_advisor_amount:Uint128,
-    pub monthly_advisor_amount_remain:Uint128
+    pub monthly_advisor_amount_remain:Uint128,
+    pub launch_pad_start_month:u64,
+    pub launch_pad_end_month:u64,
+    pub launch_pad_next_month:u64,
+    pub launch_pad_amount_monthly:Uint128,
+    pub launch_pad_amount_remain:Uint128,
+    pub team_start_month:u64,
+    pub team_end_month:u64,
+    pub team_next_month:u64,
+    pub team_amount_monthly:Uint128,
+    pub team_amount_monthly_remain:Uint128,
+    pub ido_start_month:u64,
+    pub ido_end_month:u64,
+
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]

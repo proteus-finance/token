@@ -47,4 +47,14 @@ pub enum ContractError {
 
     #[error("Invalid Liquidity Amount Entered")]
     InvalidLiquidity {},
+
+    #[error("Time Ended")]
+    TimeEnd {},
+
+    #[error("6 Month not Completed")]
+    TimeNotComplete {},
+
+    #[error("Wrong IDO Duration")]
+    Idoduration{},
+
 }

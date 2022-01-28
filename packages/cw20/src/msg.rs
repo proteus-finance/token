@@ -15,7 +15,18 @@ pub enum Cw20ExecuteMsg {
 
     Advisor { recipient: String, amount: Uint128 },
 
+    Launch { recipient: String, amount: Uint128 },
+
+    Team { recipient: String, amount: Uint128 },
+
     Transfer { recipient: String, amount: Uint128 },
+
+    Insurance { recipient: String, amount: Uint128 },
+
+    Staking { recipient: String, amount: Uint128 },
+
+    Ido { recipient: String, amount: Uint128 },
+
     /// Burn is a base message to destroy tokens forever
     Burn { amount: Uint128 },
     /// Send is a base message to transfer tokens to a contract and trigger an action

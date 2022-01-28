@@ -127,14 +127,24 @@ pub fn instantiate(
     let _advisors = (_cap * Uint128::new(2))/Uint128::new(100);
     let _launch_pad = (_cap * Uint128::new(15))/Uint128::new(100);
     let _liquidity = (_cap * Uint128::new(6))/Uint128::new(100);
-    let _start_time=_env.block.time.seconds();
+    let _start_time=_env.block.time.seconds() + 3*30*24*60*60;
     //let _end_time=_env.block.time.seconds() + 23*30*24*60*60;
-    let _end_time=_env.block.time.seconds() + 1200;
+    let _end_time=_env.block.time.seconds() + 23*30*24*60*60;
     let _mothly_seed=(_seed_token_sale * Uint128::new(5))/Uint128::new(100);
-    let _three_month_period=_env.block.time.seconds() + 300;
-    let _next_month=_env.block.time.seconds() + 600;
+    let _three_month_period=_env.block.time.seconds() + 3*30*24*60*60;
+    let _next_month=_env.block.time.seconds() + 4*30*24*60*60;
     let  _monthly_advisor_amount=(_advisors * Uint128::new(10))/Uint128::new(100);
-    let  _end_month_advisor = _env.block.time.seconds() + 1200;
+    let  _end_month_advisor = _env.block.time.seconds() + 13*30*24*60*60;
+    let _launch_pad_amount_monthly =  (_launch_pad *Uint128::new(10))/Uint128::new(100);
+    let _launch_pad_end_month=_env.block.time.seconds() + 16*30*24*60*60;
+    let _launch_pad_next_month=_env.block.time.seconds() + 7*30*24*60*60;
+    let _launch_pad_start_month=_env.block.time.seconds() + 6*30*24*60*60;
+    let _team_end_month = _env.block.time.seconds() + 16*30*24*60*60;
+    let _team_amount_monthly = (_team *Uint128::new(10))/Uint128::new(100);
+    let _team_next_month = _env.block.time.seconds() + 7*30*24*60*60;
+    let _ido_start_month = _env.block.time.seconds() + 6*30*24*60*60 ;
+    let _ido_end_month   =   _env.block.time.seconds() + 8*30*24*60*60;
+
 
     // store token info
     let data = TokenInfo {
@@ -164,6 +174,19 @@ pub fn instantiate(
         monthly_advisor_amount:_monthly_advisor_amount,
         monthly_advisor_amount_remain:_monthly_advisor_amount,
         end_month_advisor:_end_month_advisor,
+        launch_pad_amount_monthly:_launch_pad_amount_monthly,
+        launch_pad_amount_remain:_launch_pad_amount_monthly,
+        launch_pad_start_month:_launch_pad_start_month,
+        launch_pad_next_month:_launch_pad_next_month,
+        launch_pad_end_month:_launch_pad_end_month,
+        team_start_month:_launch_pad_start_month,
+        team_end_month:_team_end_month,
+        team_next_month:_team_next_month,
+        team_amount_monthly:_team_amount_monthly,
+        team_amount_monthly_remain:_team_amount_monthly,
+        ido_start_month:_ido_start_month,
+        ido_end_month:_ido_end_month,
+
 
 
         
@@ -220,6 +243,21 @@ pub fn execute(
     match msg {
         ExecuteMsg::Liquidity { recipient, amount } => {
             execute_liquidity(deps, env, info, recipient, amount)
+        }
+        ExecuteMsg::Ido { recipient, amount } => {
+            execute_ido(deps, env, info, recipient, amount)
+        }
+        ExecuteMsg::Staking { recipient, amount } => {
+            execute_staking(deps, env, info, recipient, amount)
+        }
+        ExecuteMsg::Insurance { recipient, amount } => {
+            execute_insurance(deps, env, info, recipient, amount) 
+        }
+        ExecuteMsg::Team { recipient, amount } => {
+            execute_team(deps, env, info, recipient, amount)
+        }
+        ExecuteMsg::Launch { recipient, amount } => {
+            execute_launch(deps, env, info, recipient, amount)
         }
         ExecuteMsg::Advisor { recipient, amount } => {
             execute_advisor(deps, env, info, recipient, amount)
@@ -363,6 +401,10 @@ pub fn execute_seed(
     {
         return Err(ContractError::InvalidAmountSeed {});
     }
+    if time > config.end_time
+    {
+        return Err(ContractError::TimeEnd {});
+    }
 
     if config.next_month > time 
     {
@@ -372,14 +414,15 @@ pub fn execute_seed(
           
         if amount <= config.monthly_seed_remain
         {
-             // config.total_supply += amount;
+             
         config.seed_token_sale -= amount;
         config.monthly_seed_remain -= amount;
-        // if let Some(limit) = config.get_cap() {
-        //     if config.total_supply > limit {
-        //         return Err(ContractError::CannotExceedCap {});
-        //     }
-        // }
+        config.total_supply += amount;
+        if let Some(limit) = config.get_cap() {
+            if config.total_supply > limit {
+                return Err(ContractError::CannotExceedCap {});
+            }
+        }
         TOKEN_INFO.save(deps.storage, &config)?;
 
         // add amount to recipient balance
@@ -411,18 +454,19 @@ pub fn execute_seed(
     }
 
     else {
-        config.next_month += 300;
-        config.start_month += 300;
+        config.next_month += 30*24*60*60;
+        config.start_month += 30*24*60*60;
+        let mut  _reamin_seed = config.monthly_seed - amount;
         config.seed_token_sale -= amount;
-        config.monthly_seed_remain = Uint128::new(0);
-        config.monthly_seed_remain = config.monthly_seed;
-        config.monthly_seed_remain -= amount;
-       
-        // if let Some(limit) = config.get_cap() {
-        //     if config.total_supply > limit {
-        //         return Err(ContractError::CannotExceedCap {});
-        //     }
-        // }
+       // config.monthly_seed_remain = Uint128::new(0);
+       // config.monthly_seed_remain = config.monthly_seed;
+        config.monthly_seed_remain =  _reamin_seed;
+        config.total_supply += amount;
+        if let Some(limit) = config.get_cap() {
+            if config.total_supply > limit {
+                return Err(ContractError::CannotExceedCap {});
+            }
+        }
         TOKEN_INFO.save(deps.storage, &config)?;
 
         // add amount to recipient balance
@@ -441,71 +485,6 @@ pub fn execute_seed(
 
     }
    
-
-//     // update supply and enforce cap
-//     if amount < config.monthly_seed_remain // 4000000 4e6
-//     {
-//         //config.total_supply += amount;
-//         config.seed_token_sale -= amount;
-//         config.monthly_seed_remain -= amount;
-//         if let Some(limit) = config.get_cap() {
-//             if config.total_supply > limit {
-//                 return Err(ContractError::CannotExceedCap {});
-//             }
-//         }
-//         TOKEN_INFO.save(deps.storage, &config)?;
-
-//         // add amount to recipient balance
-//         let rcpt_addr = deps.api.addr_validate(&recipient)?;
-//         BALANCES.update(
-//             deps.storage,
-//             &rcpt_addr,
-//             |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
-//         )?;
-
-//         let res = Response::new()
-//             .add_attribute("action", "mint")
-//             .add_attribute("to", recipient)
-//             .add_attribute("amount", amount);
-//         Ok(res)
-// }
-// else 
-// {
-//   if time > config.month
-//   {  
-//     // config.month += 30*24*60*60;
-//     config.month +=300;
-//     config.monthly_seed_remain +=config.monthly_seed;
-//     config.total_supply += amount;
-//     config.seed_token_sale -= amount;
-//     config.monthly_seed_remain -= amount;
-//     if let Some(limit) = config.get_cap() {
-//         if config.total_supply > limit {
-//             return Err(ContractError::CannotExceedCap {});
-//         }
-//     }
-//     TOKEN_INFO.save(deps.storage, &config)?;
-
-//     // add amount to recipient balance
-//     let rcpt_addr = deps.api.addr_validate(&recipient)?;
-//     BALANCES.update(
-//         deps.storage,
-//         &rcpt_addr,
-//         |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
-//     )?;
-
-//     let res = Response::new()
-//         .add_attribute("action", "mint")
-//         .add_attribute("to", recipient)
-//         .add_attribute("amount", amount);
-//     Ok(res)
-//   }
-//   else 
-// {
-//     return Err(ContractError::InvalidAmountFinish {});
-// }
-
-// }
 
 }
 
@@ -533,21 +512,24 @@ pub fn execute_liquidity(
     }
     else{
         config.liquidity -= amount ;
-    let rcpt_addr = deps.api.addr_validate(&recipient)?;
-    TOKEN_INFO.save(deps.storage, &config)?;
+  //  TOKEN_INFO.save(deps.storage, &config)?;
 
-    BALANCES.update(
-        deps.storage,
-        &info.sender,
-        |balance: Option<Uint128>| -> StdResult<_> {
-            Ok(balance.unwrap_or_default().checked_sub(amount)?)
-        },
-    )?;
-    BALANCES.update(
-        deps.storage,
-        &rcpt_addr,
-        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
-    )?;
+   // update supply and enforce cap
+   config.total_supply += amount;
+   if let Some(limit) = config.get_cap() {
+       if config.total_supply > limit {
+           return Err(ContractError::CannotExceedCap {});
+       }
+   }
+   TOKEN_INFO.save(deps.storage, &config)?;
+
+   // add amount to recipient balance
+   let rcpt_addr = deps.api.addr_validate(&recipient)?;
+   BALANCES.update(
+       deps.storage,
+       &rcpt_addr,
+       |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+   )?;
 
     let res = Response::new()
         .add_attribute("action", "liquidity")
@@ -591,6 +573,11 @@ pub fn execute_liquidity(
             return Err(ContractError::InvalidAmountSeed {});
         }
 
+        if time > config.end_month_advisor
+        {
+            return Err(ContractError::TimeEnd {});
+        }
+
         if config.next_month_advisor > time 
         {
             if config.start_month_advisor < time && config.next_month_advisor > time 
@@ -599,28 +586,31 @@ pub fn execute_liquidity(
                 {
                     config.monthly_advisor_amount_remain -= amount ;
                     config.advisors -= amount ;
-                    let rcpt_addr = deps.api.addr_validate(&recipient)?;
-                    TOKEN_INFO.save(deps.storage, &config)?;
+                   
+                    //TOKEN_INFO.save(deps.storage, &config)?;
                 
-                    BALANCES.update(
-                        deps.storage,
-                        &info.sender,
-                        |balance: Option<Uint128>| -> StdResult<_> {
-                            Ok(balance.unwrap_or_default().checked_sub(amount)?)
-                        },
-                    )?;
-                    BALANCES.update(
-                        deps.storage,
-                        &rcpt_addr,
-                        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
-                    )?;
-                
-                    let res = Response::new()
-                        .add_attribute("action", "advisor")
-                        .add_attribute("from", info.sender)
-                        .add_attribute("to", recipient)
-                        .add_attribute("amount", amount);
-                    Ok(res)
+                 config.total_supply += amount;
+             if let Some(limit) = config.get_cap() {
+               if config.total_supply > limit {
+            return Err(ContractError::CannotExceedCap {});
+        }
+    }
+    TOKEN_INFO.save(deps.storage, &config)?;
+
+    // add amount to recipient balance
+    let rcpt_addr = deps.api.addr_validate(&recipient)?;
+    BALANCES.update(
+        deps.storage,
+        &rcpt_addr,
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+    )?;
+        
+            let res = Response::new()
+                .add_attribute("action", "advisor")
+                .add_attribute("from", info.sender)
+                .add_attribute("to", recipient)
+                .add_attribute("amount", amount);
+            Ok(res)
                 }
                 else
                 {
@@ -635,25 +625,31 @@ pub fn execute_liquidity(
         }
         else
         {
-            config.start_month_advisor += 300;
-            config.next_month_advisor  += 300;
-            config.monthly_advisor_amount_remain -= amount ;
+            config.start_month_advisor += 30*24*60*60;
+            config.next_month_advisor  += 30*24*60*60;
+            let mut  _reamin_amount = config.monthly_advisor_amount - amount;
+            // _reamin_amount = config.monthly_advisor_amount - amount;
+            config.monthly_advisor_amount_remain = _reamin_amount;
             config.advisors -= amount ;
-            let rcpt_addr = deps.api.addr_validate(&recipient)?;
-            TOKEN_INFO.save(deps.storage, &config)?;
         
-            BALANCES.update(
-                deps.storage,
-                &info.sender,
-                |balance: Option<Uint128>| -> StdResult<_> {
-                    Ok(balance.unwrap_or_default().checked_sub(amount)?)
-                },
-            )?;
-            BALANCES.update(
-                deps.storage,
-                &rcpt_addr,
-                |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
-            )?;
+           // TOKEN_INFO.save(deps.storage, &config)?;
+        
+             // update supply and enforce cap
+    config.total_supply += amount;
+    if let Some(limit) = config.get_cap() {
+        if config.total_supply > limit {
+            return Err(ContractError::CannotExceedCap {});
+        }
+    }
+    TOKEN_INFO.save(deps.storage, &config)?;
+
+    // add amount to recipient balance
+    let rcpt_addr = deps.api.addr_validate(&recipient)?;
+    BALANCES.update(
+        deps.storage,
+        &rcpt_addr,
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+    )?;
         
             let res = Response::new()
                 .add_attribute("action", "advisor")
@@ -664,9 +660,409 @@ pub fn execute_liquidity(
         }
     }
 
+pub fn execute_launch(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    recipient: String,
+    amount: Uint128,
+)-> Result<Response, ContractError>
+{
+    if amount == Uint128::zero() {
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    let time = _env.block.time.seconds();
+
+    if time < config.launch_pad_start_month {
+
+        return Err(ContractError::TimeNotComplete{});
+    }
+
+    if amount == Uint128::zero() {
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+
+    if config.owner != info.sender {
+        return Err(ContractError::Unauthorized {});
+    }
+    if amount > config.launch_pad_amount_monthly
+    {
+        return Err(ContractError::InvalidAmountSeed {});
+    }
+    if time > config.launch_pad_end_month
+    {
+        return Err(ContractError::TimeEnd {});
+    }
+
+    if config.launch_pad_next_month > time 
+    {
+        if config.launch_pad_start_month < time && config.launch_pad_next_month > time 
+        {
+            if amount <= config.launch_pad_amount_remain
+            {
+                config.launch_pad_amount_remain -= amount ;
+                config.launch_pad -= amount ;
+               
+             //   TOKEN_INFO.save(deps.storage, &config)?;
+            
+             config.total_supply += amount;
+             if let Some(limit) = config.get_cap() {
+                 if config.total_supply > limit {
+                     return Err(ContractError::CannotExceedCap {});
+                 }
+             }
+             TOKEN_INFO.save(deps.storage, &config)?;
+         
+             // add amount to recipient balance
+             let rcpt_addr = deps.api.addr_validate(&recipient)?;
+             BALANCES.update(
+                 deps.storage,
+                 &rcpt_addr,
+                 |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+             )?;
+                 
+                     let res = Response::new()
+                         .add_attribute("action", "launch")
+                         .add_attribute("from", info.sender)
+                         .add_attribute("to", recipient)
+                         .add_attribute("amount", amount);
+                     Ok(res)
+            }
+            else
+            {
+                return Err(ContractError::InvalidAmountSeed {});
+            }
+        } else
+
+        {
+            return Err(ContractError::InvalidZeroAmount {});
+            
+        }
+    }
+    else
+    {
+        config.launch_pad_start_month += 300;
+        config.launch_pad_next_month += 300;
+        let mut  _reamin_amount = config.launch_pad_amount_monthly - amount;
+        // _reamin_amount = config.monthly_advisor_amount - amount;
+        config.launch_pad_amount_remain = _reamin_amount;
+        config.launch_pad -= amount ;
+    
+       // TOKEN_INFO.save(deps.storage, &config)?;
+    
+         // update supply and enforce cap
+config.total_supply += amount;
+if let Some(limit) = config.get_cap() {
+    if config.total_supply > limit {
+        return Err(ContractError::CannotExceedCap {});
+    }
+}
+TOKEN_INFO.save(deps.storage, &config)?;
+
+// add amount to recipient balance
+let rcpt_addr = deps.api.addr_validate(&recipient)?;
+BALANCES.update(
+    deps.storage,
+    &rcpt_addr,
+    |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+)?;
+    
+        let res = Response::new()
+            .add_attribute("action", "launch")
+            .add_attribute("from", info.sender)
+            .add_attribute("to", recipient)
+            .add_attribute("amount", amount);
+        Ok(res)
+    }
+
+}
+
+pub fn execute_team(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    recipient: String,
+    amount: Uint128,
+)-> Result<Response, ContractError>
+{
+    if amount == Uint128::zero() {
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    let time = _env.block.time.seconds();
+
+    if time < config.team_start_month {
+
+        return Err(ContractError::TimeNotComplete{});
+    }
+
+    if amount == Uint128::zero() {
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+
+    if config.owner != info.sender {
+        return Err(ContractError::Unauthorized {});
+    }
+    if amount > config.team_amount_monthly
+    {
+        return Err(ContractError::InvalidAmountSeed {});
+    }
+    if time > config.team_end_month
+    {
+        return Err(ContractError::TimeEnd {});
+    }
+
+    if config.team_next_month > time 
+    {
+        if config.team_start_month < time && config.team_next_month > time 
+        {
+            if amount <= config.team_amount_monthly_remain
+            {
+                config.team_amount_monthly_remain -= amount ;
+                config.team -= amount ;
+               
+             //   TOKEN_INFO.save(deps.storage, &config)?;
+            
+             config.total_supply += amount;
+             if let Some(limit) = config.get_cap() {
+                 if config.total_supply > limit {
+                     return Err(ContractError::CannotExceedCap {});
+                 }
+             }
+             TOKEN_INFO.save(deps.storage, &config)?;
+         
+             // add amount to recipient balance
+             let rcpt_addr = deps.api.addr_validate(&recipient)?;
+             BALANCES.update(
+                 deps.storage,
+                 &rcpt_addr,
+                 |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+             )?;
+                 
+                     let res = Response::new()
+                         .add_attribute("action", "team")
+                         .add_attribute("from", info.sender)
+                         .add_attribute("to", recipient)
+                         .add_attribute("amount", amount);
+                     Ok(res)
+            }
+            else
+            {
+                return Err(ContractError::InvalidAmountSeed {});
+            }
+        } else
+
+        {
+            return Err(ContractError::InvalidZeroAmount {});
+            
+        }
+    }
+    else
+    {
+        config.team_start_month += 30*24*60*60;
+        config.team_next_month += 30*24*60*60;
+        let mut  _reamin_amount = config.team_amount_monthly - amount;
+        // _reamin_amount = config.monthly_advisor_amount - amount;
+        config.team_amount_monthly_remain = _reamin_amount;
+        config.team -= amount ;
+    
+       // TOKEN_INFO.save(deps.storage, &config)?;
+    
+         // update supply and enforce cap
+config.total_supply += amount;
+if let Some(limit) = config.get_cap() {
+    if config.total_supply > limit {
+        return Err(ContractError::CannotExceedCap {});
+    }
+}
+TOKEN_INFO.save(deps.storage, &config)?;
+
+// add amount to recipient balance
+let rcpt_addr = deps.api.addr_validate(&recipient)?;
+BALANCES.update(
+    deps.storage,
+    &rcpt_addr,
+    |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+)?;
+    
+        let res = Response::new()
+            .add_attribute("action", "team")
+            .add_attribute("from", info.sender)
+            .add_attribute("to", recipient)
+            .add_attribute("amount", amount);
+        Ok(res)
+    }
+
+}
+
+pub fn execute_insurance(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    recipient: String,
+    amount: Uint128,
+) -> Result<Response, ContractError>
+{
+    if amount == Uint128::zero() {
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    
+    if config.owner != info.sender 
+    {
+        return Err(ContractError::Unauthorized {}); 
+    }
+
+    if config.insurance_funds < amount
+    {
+        return Err(ContractError::InvalidLiquidity {}); 
+    }
+    else{
+        config.insurance_funds -= amount ;
+  //  TOKEN_INFO.save(deps.storage, &config)?;
+
+   // update supply and enforce cap
+   config.total_supply += amount;
+   if let Some(limit) = config.get_cap() {
+       if config.total_supply > limit {
+           return Err(ContractError::CannotExceedCap {});
+       }
+   }
+   TOKEN_INFO.save(deps.storage, &config)?;
+
+   // add amount to recipient balance
+   let rcpt_addr = deps.api.addr_validate(&recipient)?;
+   BALANCES.update(
+       deps.storage,
+       &rcpt_addr,
+       |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+   )?;
+
+    let res = Response::new()
+        .add_attribute("action", "insurance")
+        .add_attribute("from", info.sender)
+        .add_attribute("to", recipient)
+        .add_attribute("amount", amount);
+    Ok(res)
+}
+    }
+
+    pub fn execute_staking(
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+        recipient: String,
+        amount: Uint128,
+    ) -> Result<Response, ContractError>
+    {
+        if amount == Uint128::zero() {
+            return Err(ContractError::InvalidZeroAmount {});
+        }
+        let mut config = TOKEN_INFO.load(deps.storage)?;
+        
+        if config.owner != info.sender 
+        {
+            return Err(ContractError::Unauthorized {}); 
+        }
+    
+        if config.staking_funds < amount
+        {
+            return Err(ContractError::InvalidLiquidity {}); 
+        }
+        else{
+            config.staking_funds -= amount ;
+      //  TOKEN_INFO.save(deps.storage, &config)?;
+    
+       // update supply and enforce cap
+       config.total_supply += amount;
+       if let Some(limit) = config.get_cap() {
+           if config.total_supply > limit {
+               return Err(ContractError::CannotExceedCap {});
+           }
+       }
+       TOKEN_INFO.save(deps.storage, &config)?;
+    
+       // add amount to recipient balance
+       let rcpt_addr = deps.api.addr_validate(&recipient)?;
+       BALANCES.update(
+           deps.storage,
+           &rcpt_addr,
+           |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+       )?;
+    
+        let res = Response::new()
+            .add_attribute("action", "staking")
+            .add_attribute("from", info.sender)
+            .add_attribute("to", recipient)
+            .add_attribute("amount", amount);
+        Ok(res)
+    }
+        }
 
 
+ pub fn execute_ido(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    recipient: String,
+    amount: Uint128,
+ )-> Result<Response, ContractError> {
+    if amount == Uint128::zero() {
 
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+
+        let mut config = TOKEN_INFO.load(deps.storage)?;
+
+        if config.owner != info.sender 
+        {
+            return Err(ContractError::Unauthorized {}); 
+        }
+
+        if config.ido < amount
+        {
+            return Err(ContractError::InvalidLiquidity {}); 
+        }
+
+        let time = _env.block.time.seconds();
+        
+        if  time > config.ido_start_month && time < config.ido_end_month
+        {
+           
+            config.ido -= amount;
+            config.total_supply += amount;
+       if let Some(limit) = config.get_cap() {
+           if config.total_supply > limit {
+               return Err(ContractError::CannotExceedCap {});
+           }
+       }
+       TOKEN_INFO.save(deps.storage, &config)?;
+    
+       // add amount to recipient balance
+       let rcpt_addr = deps.api.addr_validate(&recipient)?;
+       BALANCES.update(
+           deps.storage,
+           &rcpt_addr,
+           |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+       )?;
+    
+        let res = Response::new()
+            .add_attribute("action", "ido")
+            .add_attribute("from", info.sender)
+            .add_attribute("to", recipient)
+            .add_attribute("amount", amount);
+        Ok(res)
+            
+        }
+        else
+        {
+            return Err(ContractError::Idoduration{}); 
+        }
+ }
+        
 pub fn execute_mint(
     deps: DepsMut,
     _env: Env,
@@ -893,7 +1289,21 @@ pub fn query_token_info(deps: Deps) -> StdResult<TokenInfoResponse> {
         next_month:info.next_month,
         next_month_advisor:info.next_month_advisor,
         start_month_advisor:info.start_month_advisor,
-        end_month_advisor:info.end_month_advisor
+        end_month_advisor:info.end_month_advisor,
+        monthly_advisor_amount:info.monthly_advisor_amount,
+        monthly_advisor_amount_remain:info.monthly_advisor_amount_remain,
+        launch_pad_amount_monthly:info.launch_pad_amount_monthly,
+        launch_pad_amount_remain:info.launch_pad_amount_remain,
+        launch_pad_end_month:info.launch_pad_end_month,
+        launch_pad_next_month:info.launch_pad_next_month,
+        launch_pad_start_month:info.launch_pad_start_month,
+        team_amount_monthly:info.team_amount_monthly,
+        team_amount_monthly_remain:info.team_amount_monthly_remain,
+        team_end_month:info.team_end_month,
+        team_start_month:info.team_start_month,
+        team_next_month:info.team_next_month,
+        ido_start_month:info.start_month,
+        ido_end_month:info.ido_end_month,
 
     
     };
