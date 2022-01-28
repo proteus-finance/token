@@ -4,14 +4,11 @@ this is cw 20 token Proteus Project. In which you can mint, transfer, and  burn 
 this project also have different more functionalties in which seed,Liquidity,Staking,Launch Pad,Advisor,IDO,Insurance and team we will explain these functionalties and also how they work,
 
 **Seed**
+
 -> seed function ***have 8*** percent of token supply.
-
 -> seed function will take two parameter one is amount thats will be in ***Uint128*** and recipient address thats will be in String.
-
 -> seed function only will work after the three months of deployment of token.
-
 -> you can only do  ***5 percent*** of seeding every month.
-
 -> seed function will not work after 23 months of token deployment. 
 
 **IDO**
