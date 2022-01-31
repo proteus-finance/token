@@ -9,7 +9,7 @@ use cw0::Expiration;
 #[serde(rename_all = "snake_case")]
 pub enum Cw20ExecuteMsg {
     /// Seed is a base message to move tokens to another account without triggering actions
-    Seed { recipient: String, amount: Uint128 },
+    Seed { recipient: String, },
 
     Liquidity { recipient: String, amount: Uint128 },
 

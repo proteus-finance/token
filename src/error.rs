@@ -57,4 +57,7 @@ pub enum ContractError {
     #[error("Wrong IDO Duration")]
     Idoduration{},
 
+    #[error("the price of token is higher")]
+    PriceToken {},
+
 }

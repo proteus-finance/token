@@ -185,11 +185,7 @@ pub fn instantiate(
         team_amount_monthly:_team_amount_monthly,
         team_amount_monthly_remain:_team_amount_monthly,
         ido_start_month:_ido_start_month,
-        ido_end_month:_ido_end_month,
-
-
-
-        
+        ido_end_month:_ido_end_month,        
     };
     TOKEN_INFO.save(deps.storage, &data)?;
 
@@ -266,8 +262,8 @@ pub fn execute(
         ExecuteMsg::Transfer { recipient, amount } => {
             execute_transfer(deps, env, info, recipient, amount)
         }
-        ExecuteMsg::Seed{ recipient, amount } => {
-            execute_seed(deps, env, info, recipient, amount)
+        ExecuteMsg::Seed{ recipient } => {
+            execute_seed(deps, env, info, recipient)
         }
         ExecuteMsg::Burn { amount } => execute_burn(deps, env, info, amount),
         ExecuteMsg::Send {
@@ -376,44 +372,51 @@ pub fn execute_seed(
     _env: Env,
     info: MessageInfo,
     recipient: String,
-    amount: Uint128,
+ //   amount: Uint128,
 )-> Result<Response,ContractError>
 {
+    let price = Uint128::new(30000); 
+    let coin = &info.funds[0];
+    if  coin.amount == Uint128::zero() 
+    {
+        return Err(ContractError::PriceToken {}); 
+    }
+
+    let amount = coin.amount/price;
+
+
     
     let mut config = TOKEN_INFO.load(deps.storage)?;
 
-    let time = _env.block.time.seconds();
+  //  let time = _env.block.time.seconds();
 
-    if time < config.three_month_period {
+    // if time < config.three_month_period {
 
-        return Err(ContractError::InvalidTime {});
-    }
+    //     return Err(ContractError::InvalidTime {});
+    // }
 
     if amount == Uint128::zero() {
         return Err(ContractError::InvalidZeroAmount {});
     }
     
-    if config.owner != info.sender {
-        return Err(ContractError::Unauthorized {});
-    }
 
     if amount > config.seed_token_sale // 80000000 8e7
     {
         return Err(ContractError::InvalidAmountSeed {});
     }
-    if time > config.end_time
-    {
-        return Err(ContractError::TimeEnd {});
-    }
+    // if time > config.end_time
+    // {
+    //     return Err(ContractError::TimeEnd {});
+    // }
 
-    if config.next_month > time 
-    {
+    // if config.next_month > time 
+    // {
     
-        if config.start_month < time &&  config.next_month > time 
-        {
+    //     if config.start_month < time &&  config.next_month > time 
+    //     {
           
-        if amount <= config.monthly_seed_remain
-        {
+    //     if amount <= config.monthly_seed_remain
+    //     {
              
         config.seed_token_sale -= amount;
         config.monthly_seed_remain -= amount;
@@ -436,54 +439,54 @@ pub fn execute_seed(
         let res = Response::new()
             .add_attribute("action", "seed")
             .add_attribute("to", recipient)
-            .add_attribute("amount", amount);
+            .add_attribute("amount", 0.5);
         Ok(res)
 
-        } 
-        else
-        {
-            return Err(ContractError::InvalidAmountSeed {});
-        }
+    //     } 
+    //     else
+    //     {
+    //         return Err(ContractError::InvalidAmountSeed {});
+    //     }
      
-        } else
+    //     } else
 
-        {
-            return Err(ContractError::InvalidZeroAmount {});
+    //     {
+    //         return Err(ContractError::InvalidZeroAmount {});
             
-        }
-    }
+    //     }
+    // }
 
-    else {
-        config.next_month += 30*24*60*60;
-        config.start_month += 30*24*60*60;
-        let mut  _reamin_seed = config.monthly_seed - amount;
-        config.seed_token_sale -= amount;
-       // config.monthly_seed_remain = Uint128::new(0);
-       // config.monthly_seed_remain = config.monthly_seed;
-        config.monthly_seed_remain =  _reamin_seed;
-        config.total_supply += amount;
-        if let Some(limit) = config.get_cap() {
-            if config.total_supply > limit {
-                return Err(ContractError::CannotExceedCap {});
-            }
-        }
-        TOKEN_INFO.save(deps.storage, &config)?;
+    // else {
+    //     config.next_month += 30*24*60*60;
+    //     config.start_month += 30*24*60*60;
+    //     let mut  _reamin_seed = config.monthly_seed - amount;
+    //     config.seed_token_sale -= amount;
+    //    // config.monthly_seed_remain = Uint128::new(0);
+    //    // config.monthly_seed_remain = config.monthly_seed;
+    //     config.monthly_seed_remain =  _reamin_seed;
+    //     config.total_supply += amount;
+    //     if let Some(limit) = config.get_cap() {
+    //         if config.total_supply > limit {
+    //             return Err(ContractError::CannotExceedCap {});
+    //         }
+    //     }
+    //     TOKEN_INFO.save(deps.storage, &config)?;
 
-        // add amount to recipient balance
-        let rcpt_addr = deps.api.addr_validate(&recipient)?;
-        BALANCES.update(
-            deps.storage,
-            &rcpt_addr,
-            |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
-        )?;
+    //     // add amount to recipient balance
+    //     let rcpt_addr = deps.api.addr_validate(&recipient)?;
+    //     BALANCES.update(
+    //         deps.storage,
+    //         &rcpt_addr,
+    //         |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+    //     )?;
 
-        let res = Response::new()
-            .add_attribute("action", "seed")
-            .add_attribute("to", recipient)
-            .add_attribute("amount", amount);
-        Ok(res)
+    //     let res = Response::new()
+    //         .add_attribute("action", "seed")
+    //         .add_attribute("to", recipient)
+    //         .add_attribute("amount", amount);
+    //     Ok(res)
 
-    }
+ //   }
    
 
 }
@@ -504,7 +507,7 @@ pub fn execute_liquidity(
     if config.owner != info.sender 
     {
         return Err(ContractError::Unauthorized {}); 
-    }
+    } 
 
     if config.liquidity < amount
     {
@@ -523,6 +526,7 @@ pub fn execute_liquidity(
    }
    TOKEN_INFO.save(deps.storage, &config)?;
 
+ 
    // add amount to recipient balance
    let rcpt_addr = deps.api.addr_validate(&recipient)?;
    BALANCES.update(
@@ -1443,7 +1447,7 @@ mod tests {
             assert_eq!(
                 query_token_info(deps.as_ref()).unwrap(),
                 TokenInfoResponse {
-                    name: "Cash Token".to_string(),
+                    name: "Proteus Token".to_string(),
                     symbol: "CASH".to_string(),
                     decimals: 9,
                     total_supply: amount,
