@@ -1398,9 +1398,9 @@ mod tests {
         mint: Option<MinterResponse>,
     ) -> TokenInfoResponse {
         let instantiate_msg = InstantiateMsg {
-            name: "Auto Gen".to_string(),
-            symbol: "AUTO".to_string(),
-            decimals: 3,
+            name: "Proteus Token".to_string(),
+            symbol: "PROTEUS".to_string(),
+            decimals: 9,
             initial_balances: vec![Cw20Coin {
                 address: addr.to_string(),
                 amount,
@@ -1417,10 +1417,43 @@ mod tests {
         assert_eq!(
             meta,
             TokenInfoResponse {
-                name: "Auto Gen".to_string(),
-                symbol: "AUTO".to_string(),
-                decimals: 3,
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
+                decimals: 9,
                 total_supply: amount,
+                seed_token_sale:Uint128::new (900000 ),
+                ido:Uint128::new(400000)  ,
+                insurance_funds:Uint128::new(50000) ,
+                team:Uint128::new(5000),
+                advisors:Uint128::new(50000) ,
+                launch_pad:Uint128::new (5000),
+                liquidity:Uint128::new(500000),
+                staking_funds:Uint128::new(6000000),
+                owner:Addr::unchecked("addr0001"),
+                end_time:1200,
+                start_month:300,
+                monthly_seed:Uint128::new(40000),
+                monthly_seed_remain:Uint128::new(4000) ,
+                three_month_period:300,
+                next_month:600,
+                next_month_advisor:600,
+                start_month_advisor:300,
+                end_month_advisor:1200,
+                monthly_advisor_amount:Uint128::new(6000),
+                monthly_advisor_amount_remain:Uint128::new(60000),
+                launch_pad_amount_monthly:Uint128::new(5000) ,
+                launch_pad_amount_remain:Uint128::new(5000),
+                launch_pad_end_month:1200,
+                launch_pad_next_month:600,
+                launch_pad_start_month:300,
+                team_amount_monthly:Uint128::new(4000) ,
+                team_amount_monthly_remain:Uint128::new(4000) ,
+                team_end_month:1200,
+                team_start_month:300,
+                team_next_month:600,
+                ido_start_month:300,
+                ido_end_month:600,
+                
             }
         );
         assert_eq!(get_balance(deps.as_ref(), addr), amount);
@@ -1438,8 +1471,8 @@ mod tests {
             let mut deps = mock_dependencies(&[]);
             let amount = Uint128::from(11223344u128);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
@@ -1457,9 +1490,41 @@ mod tests {
                 query_token_info(deps.as_ref()).unwrap(),
                 TokenInfoResponse {
                     name: "Proteus Token".to_string(),
-                    symbol: "CASH".to_string(),
+                    symbol: "PROTEUS".to_string(),
                     decimals: 9,
                     total_supply: amount,
+                    seed_token_sale:Uint128::new (900000 ),
+                    ido:Uint128::new(400000)  ,
+                    insurance_funds:Uint128::new(50000) ,
+                    team:Uint128::new(5000),
+                    advisors:Uint128::new(50000) ,
+                    launch_pad:Uint128::new (5000),
+                    liquidity:Uint128::new(500000),
+                    staking_funds:Uint128::new(6000000),
+                    owner:Addr::unchecked("addr0001"),
+                    end_time:1200,
+                    start_month:300,
+                    monthly_seed:Uint128::new(40000),
+                    monthly_seed_remain:Uint128::new(4000) ,
+                    three_month_period:300,
+                    next_month:600,
+                    next_month_advisor:600,
+                    start_month_advisor:300,
+                    end_month_advisor:1200,
+                    monthly_advisor_amount:Uint128::new(6000),
+                    monthly_advisor_amount_remain:Uint128::new(60000),
+                    launch_pad_amount_monthly:Uint128::new(5000) ,
+                    launch_pad_amount_remain:Uint128::new(5000),
+                    launch_pad_end_month:1200,
+                    launch_pad_next_month:600,
+                    launch_pad_start_month:300,
+                    team_amount_monthly:Uint128::new(4000) ,
+                    team_amount_monthly_remain:Uint128::new(4000) ,
+                    team_end_month:1200,
+                    team_start_month:300,
+                    team_next_month:600,
+                    ido_start_month:300,
+                    ido_end_month:600,
                 }
             );
             assert_eq!(
@@ -1475,8 +1540,8 @@ mod tests {
             let minter = String::from("asmodat");
             let limit = Uint128::new(511223344);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![Cw20Coin {
                     address: "addr0000".into(),
@@ -1496,10 +1561,42 @@ mod tests {
             assert_eq!(
                 query_token_info(deps.as_ref()).unwrap(),
                 TokenInfoResponse {
-                    name: "Cash Token".to_string(),
-                    symbol: "CASH".to_string(),
+                    name: "Proteus Token".to_string(),
+                    symbol: "PROTEUS".to_string(),
                     decimals: 9,
                     total_supply: amount,
+                    seed_token_sale:Uint128::new (900000 ),
+                    ido:Uint128::new(400000)  ,
+                    insurance_funds:Uint128::new(50000) ,
+                    team:Uint128::new(5000),
+                    advisors:Uint128::new(50000) ,
+                    launch_pad:Uint128::new (5000),
+                    liquidity:Uint128::new(500000),
+                    staking_funds:Uint128::new(6000000),
+                    owner:Addr::unchecked("addr0001"),
+                    end_time:1200,
+                    start_month:300,
+                    monthly_seed:Uint128::new(40000),
+                    monthly_seed_remain:Uint128::new(4000) ,
+                    three_month_period:300,
+                    next_month:600,
+                    next_month_advisor:600,
+                    start_month_advisor:300,
+                    end_month_advisor:1200,
+                    monthly_advisor_amount:Uint128::new(6000),
+                    monthly_advisor_amount_remain:Uint128::new(60000),
+                    launch_pad_amount_monthly:Uint128::new(5000) ,
+                    launch_pad_amount_remain:Uint128::new(5000),
+                    launch_pad_end_month:1200,
+                    launch_pad_next_month:600,
+                    launch_pad_start_month:300,
+                    team_amount_monthly:Uint128::new(4000) ,
+                    team_amount_monthly_remain:Uint128::new(4000) ,
+                    team_end_month:1200,
+                    team_start_month:300,
+                    team_next_month:600,
+                    ido_start_month:300,
+                    ido_end_month:600,
                 }
             );
             assert_eq!(
@@ -1522,8 +1619,8 @@ mod tests {
             let minter = String::from("asmodat");
             let limit = Uint128::new(11223300);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
@@ -1551,8 +1648,8 @@ mod tests {
             fn basic() {
                 let mut deps = mock_dependencies(&[]);
                 let instantiate_msg = InstantiateMsg {
-                    name: "Cash Token".to_string(),
-                    symbol: "CASH".to_string(),
+                    name: "Proteus Token".to_string(),
+                    symbol: "PROTEUS".to_string(),
                     decimals: 9,
                     initial_balances: vec![],
                     mint: None,
@@ -1591,8 +1688,8 @@ mod tests {
             fn invalid_marketing() {
                 let mut deps = mock_dependencies(&[]);
                 let instantiate_msg = InstantiateMsg {
-                    name: "Cash Token".to_string(),
-                    symbol: "CASH".to_string(),
+                    name: "Proteus Token".to_string(),
+                    symbol: "PROTEUS".to_string(),
                     decimals: 9,
                     initial_balances: vec![],
                     mint: None,
@@ -1623,9 +1720,9 @@ mod tests {
         let mut deps = mock_dependencies(&[]);
 
         let genesis = String::from("genesis");
-        let amount = Uint128::new(11223344);
+        let amount = Uint128::new(1000000000);
         let minter = String::from("asmodat");
-        let limit = Uint128::new(511223344);
+        let limit = Uint128::new(2000000000);
         do_instantiate_with_minter(deps.as_mut(), &genesis, amount, &minter, Some(limit));
 
         // minter can mint coins to some winner
@@ -1709,8 +1806,8 @@ mod tests {
         let amount2 = Uint128::from(7890987u128);
         let addr2 = String::from("addr0002");
         let instantiate_msg = InstantiateMsg {
-            name: "Bash Shell".to_string(),
-            symbol: "BASH".to_string(),
+            name: "Proteus Token".to_string(),
+            symbol: "PROTEUS".to_string(),
             decimals: 6,
             initial_balances: vec![
                 Cw20Coin {
@@ -1733,10 +1830,42 @@ mod tests {
         assert_eq!(
             query_token_info(deps.as_ref()).unwrap(),
             TokenInfoResponse {
-                name: "Bash Shell".to_string(),
-                symbol: "BASH".to_string(),
-                decimals: 6,
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
+                decimals: 9,
                 total_supply: amount1 + amount2,
+                seed_token_sale:Uint128::new (900000 ),
+                ido:Uint128::new(400000)  ,
+                insurance_funds:Uint128::new(50000) ,
+                team:Uint128::new(5000),
+                advisors:Uint128::new(50000) ,
+                launch_pad:Uint128::new (5000),
+                liquidity:Uint128::new(500000),
+                staking_funds:Uint128::new(6000000),
+                owner:Addr::unchecked("addr0001"),
+                end_time:1200,
+                start_month:300,
+                monthly_seed:Uint128::new(40000),
+                monthly_seed_remain:Uint128::new(4000) ,
+                three_month_period:300,
+                next_month:600,
+                next_month_advisor:600,
+                start_month_advisor:300,
+                end_month_advisor:1200,
+                monthly_advisor_amount:Uint128::new(6000),
+                monthly_advisor_amount_remain:Uint128::new(60000),
+                launch_pad_amount_monthly:Uint128::new(5000) ,
+                launch_pad_amount_remain:Uint128::new(5000),
+                launch_pad_end_month:1200,
+                launch_pad_next_month:600,
+                launch_pad_start_month:300,
+                team_amount_monthly:Uint128::new(4000) ,
+                team_amount_monthly_remain:Uint128::new(4000) ,
+                team_end_month:1200,
+                team_start_month:300,
+                team_next_month:600,
+                ido_start_month:300,
+                ido_end_month:600,
             }
         );
         assert_eq!(get_balance(deps.as_ref(), addr1), amount1);
@@ -1970,8 +2099,8 @@ mod tests {
         fn update_unauthorised() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2024,8 +2153,8 @@ mod tests {
         fn update_project() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2077,8 +2206,8 @@ mod tests {
         fn clear_project() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2130,8 +2259,8 @@ mod tests {
         fn update_description() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2183,8 +2312,8 @@ mod tests {
         fn clear_description() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2236,8 +2365,8 @@ mod tests {
         fn update_marketing() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2289,8 +2418,8 @@ mod tests {
         fn update_marketing_invalid() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2346,8 +2475,8 @@ mod tests {
         fn clear_marketing() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2399,8 +2528,8 @@ mod tests {
         fn update_logo_url() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2448,8 +2577,8 @@ mod tests {
         fn update_logo_png() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2498,8 +2627,8 @@ mod tests {
         fn update_logo_svg() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2549,8 +2678,8 @@ mod tests {
         fn update_logo_png_oversized() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2599,8 +2728,8 @@ mod tests {
         fn update_logo_svg_oversized() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2656,8 +2785,8 @@ mod tests {
         fn update_logo_png_invalid() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
@@ -2706,8 +2835,8 @@ mod tests {
         fn update_logo_svg_invalid() {
             let mut deps = mock_dependencies(&[]);
             let instantiate_msg = InstantiateMsg {
-                name: "Cash Token".to_string(),
-                symbol: "CASH".to_string(),
+                name: "Proteus Token".to_string(),
+                symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
