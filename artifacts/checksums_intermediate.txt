@@ -1,1 +1,0 @@
-04f0172a55ef642c5c802b4a88d03b54b88b93c1049d1f40c443fe8a4660b19c  ./target/wasm32-unknown-unknown/release/cw20_base.wasm
