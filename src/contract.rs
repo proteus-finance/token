@@ -1381,23 +1381,23 @@ mod tests {
     }
 
     // this will set up the instantiation for other tests
-    fn do_instantiate_with_minter(
-        deps: DepsMut,
-        addr: &str,
-        amount: Uint128,
-        minter: &str,
-        cap: Option<Uint128>,
-    ) -> TokenInfoResponse {
-        _do_instantiate(
-            deps,
-            addr,
-            amount,
-            Some(MinterResponse {
-                minter: minter.to_string(),
-                cap,
-            }),
-        )
-    }
+    // fn do_instantiate_with_minter(
+    //     deps: DepsMut,
+    //     addr: &str,
+    //     amount: Uint128,
+    //     minter: &str,
+    //     cap: Option<Uint128>,
+    // ) -> TokenInfoResponse {
+    //     _do_instantiate(
+    //         deps,
+    //         addr,
+    //         amount,
+    //         Some(MinterResponse {
+    //             minter: minter.to_string(),
+    //             cap,
+    //         }),
+    //     )
+    // }
 
     // this will set up the instantiation for other tests
     // fn do_instantiate(deps: DepsMut, addr: &str, amount: Uint128) -> TokenInfoResponse {
