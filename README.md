@@ -59,6 +59,12 @@
 * Liquidity function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
 
 ## Enviorment Setup
+
+
+  ```sh
+  git clone --depth 1 https://github.com/terra-money/localterra
+  ```
+
    ...sh
 *  git clone --depth 1 https://github.com/terra-money/localterra
    ...
