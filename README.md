@@ -22,9 +22,9 @@
   ```
 *  go to the terra folder  
 
-   ```sh
-   docker-compose up 
-   ```
+  ```sh
+  docker-compose up 
+  ```
 *  run the docker in your system by above command
 *  and follow the blow commands step by step
   ```sh
