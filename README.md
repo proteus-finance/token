@@ -64,45 +64,34 @@
   ```sh
   git clone --depth 1 https://github.com/terra-money/localterra
   ```
-
-   ...sh
-*  git clone --depth 1 https://github.com/terra-money/localterra
-   ...
-*  so first clone the repo for setting terra
-   ...sh
+   so first clone the repo for setting terra
+   ```sh
 *  cd localterra
-   ...
+   ```
 *  go to the terra folder  
-   ...sh
-*  docker-compose up 
-   ...
+   ```sh
+  docker-compose up 
+   ```
 *  run the docker in your system by above command
-
 *  and follow the blow commands step by step
-   ...sh
-*  rustup default stable
-   ...
-   ...sh
-*  rustup target add wasm32-unknown-unknown
-   ...
-   ...sh
-*  cargo install cargo-generate --features vendored-openssl
-   ...
-   ...sh
-*  cargo install cargo-run-script
-   ...
+   ```sh
+  rustup default stable
+  rustup target add wasm32-unknown-unknown
+  cargo install cargo-generate --features vendored-openssl
+  cargo install cargo-run-script
+   ```
 
 ## Build Project
 
 * now we will see the steps to build the projecct so you need to follow bellow steps to compile the code
-  ...sh
-* cargo wasm
-  ...
+  ```sh
+ cargo wasm
+  ```
 
 * thats command will build the project and make target folder in your project.
-  ...sh
-* cargo run-script optimize
-  ...
+ ```sh
+cargo run-script optimize
+  ```
 
 * this command will genrate artifact file in your folder and this folder have cw20.wasm file
 
