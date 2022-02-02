@@ -83,16 +83,16 @@
 
 ## Deploy Project on Terra
 
-* now the time to deploy the smart contract on terra .
-* so open the terra station
-* # https://station.terra.money/contract  
-* upload your wam on terra station 
-* open the transaction on terra explorer
-* copy the code etc "3240"
-* then come back to terrastation and click to instantiate 
-* enter code and init msg this init msg will be in json.
-* and confirm the trnasaction
-* so now you deployed succesfully smart contract on terra  blockchain
+>  now the time to deploy the smart contract on terra .
+> so open the terra station
+>  https://station.terra.money/contract  
+> upload your wam on terra station 
+> open the transaction on terra explorer
+> copy the code etc "3240"
+> then come back to terrastation and click to instantiate 
+> enter code and init msg this init msg will be in json.
+> and confirm the trnasaction
+> so now you deployed succesfully smart contract on terra  blockchain
 
 
 
