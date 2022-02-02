@@ -37,9 +37,10 @@
 ## Build Project
 
 * now we will see the steps to build the projecct so you need to follow bellow steps to compile the code
-  ```sh
-  cargo wasm
-  ```
+
+```sh
+cargo wasm
+```
 
  * thats command will build the project and make target folder in your project.
 
