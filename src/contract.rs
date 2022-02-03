@@ -121,9 +121,9 @@ pub fn instantiate(
     let _ido = (_cap * Uint128::new(4))/Uint128::new(100);
     let _staking_funds = (_cap * Uint128::new(25))/Uint128::new(100);
     let _insurance_funds = (_cap * Uint128::new(20))/Uint128::new(100);
-    let _team = (_cap * Uint128::new(20))/Uint128::new(100);
+    let _team = (_cap * Uint128::new(18))/Uint128::new(100);
     let _advisors = (_cap * Uint128::new(2))/Uint128::new(100);
-    let _launch_pad = (_cap * Uint128::new(15))/Uint128::new(100);
+    let _launch_pad = (_cap * Uint128::new(17))/Uint128::new(100);
     let _liquidity = (_cap * Uint128::new(6))/Uint128::new(100);
     let _start_time=_env.block.time.seconds() + 3*30*24*60*60;
     //let _end_time=_env.block.time.seconds() + 23*30*24*60*60;
