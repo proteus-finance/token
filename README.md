@@ -3,7 +3,13 @@
     <img align="left" src="assets/logo_with_text.svg" height="150" alt="Logo">
   </a>
   <br/>
-  <hr />
+  <br/>
+  <br/>
+  <br/>
+
+  <br/>
+  <br/>
+  <br/>
   <br/>
   <h2 align="left">Proteus Token</h2>
     <p>This is cw 20 token Proteus Project. In which you can mint, transfer, and burn tokens.</p>
