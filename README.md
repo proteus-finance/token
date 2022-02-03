@@ -70,8 +70,8 @@ cargo wasm
 * Seed function **_have 8_** percent of token supply
 * Seed function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
 * Seed function only will work after the three months of deployment of token
-* You can only do **_5 percent_** of seeding every month
-* Seed function will not work after 23 months of token deployment
+* Seed will directly start after deployment.
+* Seed function will not work after 18 months of token deployment
 
 ## IDO
 
