@@ -1,1 +1,6 @@
+# OS files
+.DS_Store
+
+# Dependency directories
 target
+
