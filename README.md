@@ -1,4 +1,4 @@
-<img align="center" src="assets/logo_with_text.svg" height="150" alt="Logo">
+<a href="https://proteus.finance/" title="Proteus Finance"><img align="center" src="assets/logo_with_text.svg" height="150" alt="Logo" /></a>
 <br />
 
 
