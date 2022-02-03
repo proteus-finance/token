@@ -127,7 +127,7 @@ pub fn instantiate(
     let _liquidity = (_cap * Uint128::new(6))/Uint128::new(100);
     let _start_time=_env.block.time.seconds() + 3*30*24*60*60;
     //let _end_time=_env.block.time.seconds() + 23*30*24*60*60;
-    let _end_time=_env.block.time.seconds() + 23*30*24*60*60;
+    let _end_time=_env.block.time.seconds() + 18*30*24*60*60;
     let _mothly_seed=(_seed_token_sale * Uint128::new(5))/Uint128::new(100);
     let _three_month_period=_env.block.time.seconds() + 3*30*24*60*60;
     let _next_month=_env.block.time.seconds() + 4*30*24*60*60;
@@ -393,10 +393,10 @@ pub fn execute_seed(
 
    let time = _env.block.time.seconds();
 
-    if time < config.three_month_period {
+    // if time < config.three_month_period {
 
-        return Err(ContractError::InvalidTime {});
-    }
+    //     return Err(ContractError::InvalidTime {});
+    // }
 
     if amount == Uint128::zero() {
         return Err(ContractError::InvalidZeroAmount {});
@@ -412,17 +412,17 @@ pub fn execute_seed(
         return Err(ContractError::TimeEnd {});
     }
 
-    if config.next_month > time 
-    {
+    // if config.next_month > time 
+    // {
     
-        if config.start_month < time &&  config.next_month > time 
-        {
+        // if config.start_month < time &&  config.next_month > time 
+        // {
           
-        if amount <= config.monthly_seed_remain
-        {
+        // if amount <= config.monthly_seed_remain
+        // {
              
         config.seed_token_sale -= amount;
-        config.monthly_seed_remain -= amount;
+        // config.monthly_seed_remain -= amount;
         config.total_supply += amount;
         if let Some(limit) = config.get_cap() {
             if config.total_supply > limit {
@@ -445,51 +445,51 @@ pub fn execute_seed(
             .add_attribute("amount", amount2);
         Ok(res)
 
-        } 
-        else
-        {
-            return Err(ContractError::InvalidAmountSeed {});
-        }
+       // } 
+        // else
+        // {
+        //     return Err(ContractError::InvalidAmountSeed {});
+        // }
      
-        } else
+        // } else
 
-        {
-            return Err(ContractError::InvalidZeroAmount {});
+        // {
+        //     return Err(ContractError::InvalidZeroAmount {});
             
-        }
-    }
+        // }
+   // }
 
-    else {
-        config.next_month += 30*24*60*60;
-        config.start_month += 30*24*60*60;
-        let mut  _reamin_seed = config.monthly_seed - amount;
-        config.seed_token_sale -= amount;
-       // config.monthly_seed_remain = Uint128::new(0);
-       // config.monthly_seed_remain = config.monthly_seed;
-        config.monthly_seed_remain =  _reamin_seed;
-        config.total_supply += amount;
-        if let Some(limit) = config.get_cap() {
-            if config.total_supply > limit {
-                return Err(ContractError::CannotExceedCap {});
-            }
-        }
-        TOKEN_INFO.save(deps.storage, &config)?;
+//     else {
+//         config.next_month += 30*24*60*60;
+//         config.start_month += 30*24*60*60;
+//         let mut  _reamin_seed = config.monthly_seed - amount;
+//         config.seed_token_sale -= amount;
+//        // config.monthly_seed_remain = Uint128::new(0);
+//        // config.monthly_seed_remain = config.monthly_seed;
+//         config.monthly_seed_remain =  _reamin_seed;
+//         config.total_supply += amount;
+//         if let Some(limit) = config.get_cap() {
+//             if config.total_supply > limit {
+//                 return Err(ContractError::CannotExceedCap {});
+//             }
+//         }
+//         TOKEN_INFO.save(deps.storage, &config)?;
 
-        // add amount to recipient balance
-        let rcpt_addr = deps.api.addr_validate(&recipient)?;
-        BALANCES.update(
-            deps.storage,
-            &rcpt_addr,
-            |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
-        )?;
+//         // add amount to recipient balance
+//         let rcpt_addr = deps.api.addr_validate(&recipient)?;
+//         BALANCES.update(
+//             deps.storage,
+//             &rcpt_addr,
+//             |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+//         )?;
 
-        let res = Response::new()
-            .add_attribute("action", "seed")
-            .add_attribute("to", recipient)
-            .add_attribute("amount", amount2);
-        Ok(res)
+//         let res = Response::new()
+//             .add_attribute("action", "seed")
+//             .add_attribute("to", recipient)
+//             .add_attribute("amount", amount2);
+//         Ok(res)
 
-   }
+//    }
    
 
 }
