@@ -1,9 +1,9 @@
 [package]
 name = "cw20-base"
 version = "0.9.0"
-authors = ["Ethan Frey <ethanfrey@users.noreply.github.com>"]
+authors = ["Mohsin Laeeque <mohsin.laeeque@arhamsoft.org>"]
 edition = "2021"
-description = "Basic implementation of a CosmWasm-20 compliant token"
+description = "Proteus Token"
 license = "Apache-2.0"
 repository = "https://github.com/CosmWasm/cw-plus"
 homepage = "https://cosmwasm.com"
