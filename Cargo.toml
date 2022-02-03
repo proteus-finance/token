@@ -9,6 +9,8 @@ repository = "https://github.com/CosmWasm/cw-plus"
 homepage = "https://cosmwasm.com"
 documentation = "https://docs.cosmwasm.com"
 
+
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 

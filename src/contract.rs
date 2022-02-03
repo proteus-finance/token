@@ -242,6 +242,9 @@ pub fn execute(
         ExecuteMsg::Liquidity { recipient, amount } => {
             execute_liquidity(deps, env, info, recipient, amount)
         }
+        ExecuteMsg::Request { recipient, amount } => {
+            execute_request(deps, env, info, recipient, amount)
+        }
         ExecuteMsg::Ido { recipient } => {
             execute_ido(deps, env, info, recipient)
         }
@@ -368,6 +371,54 @@ pub fn execute_burn(
         .add_attribute("from", info.sender)
         .add_attribute("amount", amount);
     Ok(res)
+}
+pub fn execute_request(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    recipient: String,
+    amount: Uint128,
+)-> Result<Response,ContractError>
+{
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    if amount == Uint128::zero() {
+        return Err(ContractError::InvalidZeroAmount {});
+    }
+    if amount > config.seed_token_sale // 80000000 8e7
+    {
+        return Err(ContractError::InvalidAmountSeed {});
+    }
+    let decimal_value=Uint128::new(1000000000);
+    let amount2= amount * decimal_value ;
+    if config.owner != info.sender 
+    {
+        return Err(ContractError::Unauthorized {}); 
+    } 
+          
+    config.seed_token_sale -= amount;
+    config.total_supply += amount;
+    if let Some(limit) = config.get_cap() {
+        if config.total_supply > limit {
+            return Err(ContractError::CannotExceedCap {});
+        }
+    }
+    TOKEN_INFO.save(deps.storage, &config)?;
+
+    // add amount to recipient balance
+    let rcpt_addr = deps.api.addr_validate(&recipient)?;
+    BALANCES.update(
+        deps.storage,
+        &rcpt_addr,
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+    )?;
+
+    let res = Response::new()
+        .add_attribute("action", "request")
+        .add_attribute("to", recipient)
+        .add_attribute("amount", amount2);
+    Ok(res)
+
+
 }
 pub fn execute_seed(
     deps: DepsMut,

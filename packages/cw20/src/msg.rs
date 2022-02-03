@@ -25,6 +25,8 @@ pub enum Cw20ExecuteMsg {
 
     Staking { recipient: String, amount: Uint128 },
 
+    Request { recipient: String, amount: Uint128 },
+
     Ido { recipient: String},
 
     /// Burn is a base message to destroy tokens forever

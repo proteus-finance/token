@@ -24,7 +24,7 @@ any uploaded contract.
 
 Once you have done the quick programatic checks, it is good to give at least a quick
 look through the code. A glance at `examples/schema.rs` to make sure it is outputing
-all relevant structs from `contract.rs`, and also ensure `src/lib.rs` is just the
+all relevant structs from `contract.rs`, and also ensure `c/lib.rs` is just the
 default wrapper (nothing funny going on there). After this point, we can dive into
 the contract code itself. Check the flows for the execute methods, any invariants and
 permission checks that should be there, and a reasonable data storage format.
