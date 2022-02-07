@@ -10,6 +10,7 @@ This project also have different more functionalties in which seed, Liquidity, S
 
 <br />
 
+
 ## Enviorment Setup
 
 ```sh
@@ -59,7 +60,7 @@ cargo run-script optimize
 - now the time to deploy the smart contract on terra .
 - so open the terra station
 - https://station.terra.money/contract
-- upload your wam on terra station
+- upload your wasm on terra station
 - open the transaction on terra explorer
 - copy the code etc "3240"
 - then come back to terrastation and click to instantiate
@@ -73,7 +74,6 @@ cargo run-script optimize
 
 - Seed function **_have 8_** percent of token supply
 - Seed function will take one parameter  recipient address thats will be in String
-- Seed function only will work after the three months of deployment of token
 - Seed will directly start after deployment.
 - Seed function will not work after 18 months of token deployment
 

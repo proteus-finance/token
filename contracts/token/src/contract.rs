@@ -437,6 +437,7 @@ pub fn execute_seed(
 
     let amount = coin.amount/price;
     let decimal_value=Uint128::new(1000000000);
+ 
     let amount2= decimal_value.multiply_ratio(coin.amount , price);
 
     
@@ -1092,7 +1093,7 @@ pub fn execute_insurance(
 
     let amount = coin.amount/price;
     let decimal_value=Uint128::new(1000000000);
-   let amount2= decimal_value.multiply_ratio(coin.amount , price);
+    let amount2= decimal_value.multiply_ratio(coin.amount , price);
 
     if amount == Uint128::zero() {
 
