@@ -1,106 +1,124 @@
-# CosmWasm Starter Pack
-
-This is a template to build smart contracts in Rust to run inside a
-[Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
-To understand the framework better, please read the overview in the
-[cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),
-and dig into the [cosmwasm docs](https://www.cosmwasm.com).
-This assumes you understand the theory and just want to get coding.
-
-## Creating a new repo from template
-
-Assuming you have a recent version of rust and cargo (v1.51.0+) installed
-(via [rustup](https://rustup.rs/)),
-then the following should get you a new repo to start a contract:
+<a href="https://proteus.finance/" title="Proteus Finance"><img align="center" src="assets/logo_with_text.svg" height="150" alt="Logo" /></a>
+<br />
 
 
-Install [cargo-generate](https://github.com/ashleygwilliams/cargo-generate) and cargo-run-script.
-Unless you did that before, run this line now:
+# Proteus Token
+
+
+This is cw 20 token Proteus Project. In which you can mint, transfer, and burn tokens.
+This project also have different more functionalties in which seed, Liquidity, Staking, Launch Pad, Advisor, IDO, Insurance and team we will explain these functionalties and also how they work
+
+<br />
+
+
+## Enviorment Setup
 
 ```sh
-cargo install cargo-generate cargo-run-script --features vendored-openssl 
+git clone --depth 1 https://github.com/terra-money/localterra
 ```
 
-Now, use it to create your new contract.
-Go to the folder in which you want to place it and run:
-
-
-**Latest: 0.16**
+so first clone the repo for setting terra
 
 ```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
-````
-
-**Older Version**
-
-Pass version as branch flag:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <version> --name PROJECT_NAME
-````
-
-Example:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.14 --name PROJECT_NAME
+cd localterra
 ```
 
-You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
-containing a simple working contract and build system that you can customize.
-
-## Create a Repo
-
-After generating, you have a initialized local git repo, but no commits, and no remote.
-Go to a server (eg. github) and create a new upstream repo (called `YOUR-GIT-URL` below).
-Then run the following:
+- go to the terra folder
 
 ```sh
-# this is needed to create a valid Cargo.lock file (see below)
-cargo check
-git branch -M main
-git add .
-git commit -m 'Initial Commit'
-git remote add origin YOUR-GIT-URL
-git push -u origin master
+docker-compose up
 ```
 
-## CI Support
+- run the docker in your system by above command
+- and follow the blow commands step by step
 
-We have template configurations for both [GitHub Actions](.github/workflows/Basic.yml)
-and [Circle CI](.circleci/config.yml) in the generated project, so you can
-get up and running with CI right away.
+```sh
+rustup default stable
+rustup target add wasm32-unknown-unknown
+cargo install cargo-generate --features vendored-openssl
+cargo install cargo-run-script
+```
 
-One note is that the CI runs all `cargo` commands
-with `--locked` to ensure it uses the exact same versions as you have locally. This also means
-you must have an up-to-date `Cargo.lock` file, which is not auto-generated.
-The first time you set up the project (or after adding any dep), you should ensure the
-`Cargo.lock` file is updated, so the CI will test properly. This can be done simply by
-running `cargo check` or `cargo unit-test`.
+## Build Project
 
-## Using your project
+- now we will see the steps to build the projecct so you need to follow bellow steps to compile the code
 
-Once you have your custom repo, you should check out [Developing](./Developing.md) to explain
-more on how to run tests and develop code. Or go through the
-[online tutorial](https://docs.cosmwasm.com/) to get a better feel
-of how to develop.
+```sh
+cargo wasm
+```
 
-[Publishing](./Publishing.md) contains useful information on how to publish your contract
-to the world, once you are ready to deploy it on a running blockchain. And
-[Importing](./Importing.md) contains information about pulling in other contracts or crates
-that have been published.
+- thats command will build the project and make target folder in your project.
 
-Please replace this README file with information about your specific project. You can keep
-the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
-proper description in the README.
+```sh
+cargo run-script optimize
+```
 
-## Gitpod integration
+- this command will genrate artifact file in your folder and this folder have cw20.wasm file
 
-[Gitpod](https://www.gitpod.io/) container-based development platform will be enabled on your project by default.
+## Deploy Project on Terra
 
-Workspace contains:
- - **rust**: for builds
- - [wasmd](https://github.com/CosmWasm/wasmd): for local node setup and client
- - **jq**: shell JSON manipulation tool
+- now the time to deploy the smart contract on terra .
+- so open the terra station
+- https://station.terra.money/contract
+- upload your wasm on terra station
+- open the transaction on terra explorer
+- copy the code etc "3240"
+- then come back to terrastation and click to instantiate
+- enter code and init msg this init msg will be in json.
+- and confirm the trnasaction
+- so now you deployed succesfully smart contract on terra blockchain
 
-Follow [Gitpod Getting Started](https://www.gitpod.io/docs/getting-started) and launch your workspace.
+---
+
+## Seed
+
+- Seed function **_have 8_** percent of token supply
+- Seed function will take one parameter  recipient address thats will be in String
+- Seed will directly start after deployment.
+- Seed function will not work after 18 months of token deployment
+
+## IDO
+
+- IDO function **_have 4_** percent of token supply.
+- IDO function will take one parameter  recipient  address thats will be in String.
+- IDO function will work from 6 to 8 momth .
+
+## Staking Fund
+
+- Staking function **_have 25_** percent of token supply.
+- Staking function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
+
+## Team
+
+- Team function **_have 18_** percent of token supply.
+- Team function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
+- Every month only **10 percent amount** of 20 percent of token can be through teaming.
+- Team function will not work after 23 months of token deployment.
+- Team function only will work after the six months of deployment of token.
+
+## Advisor
+
+- Advisor function **_have 2_** percent of token supply.
+- Advisor function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
+- Every month only **10 percent amount** of 2 percent of token can be through advising.
+- Advisor function will not work after 13 months of token deployment.
+- Advisor function only will work after the six months of deployment of token.
+
+## Launchpad
+
+- Launchpad function **_have 17_** percent of token supply.
+- Launchpad function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
+- Every month only **10 percent amount** of 15 percent of token can be through advising.
+- Launchpad function will not work after 16 months of token deployment.
+- Launchpad function only will work after the six months of deployment of token.
+
+## Liquidity
+
+- Liquidity function **_have 6_** percent of token supply.
+- Liquidity function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
+
+## Insurance
+
+- Insurance function **_have 2_** percent of token supply.
+- Insurance function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
 

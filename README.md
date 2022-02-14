@@ -2,123 +2,43 @@
 <br />
 
 
-# Proteus Token
+# The Proteus Finance Project
 
 
-This is cw 20 token Proteus Project. In which you can mint, transfer, and burn tokens.
-This project also have different more functionalties in which seed, Liquidity, Staking, Launch Pad, Advisor, IDO, Insurance and team we will explain these functionalties and also how they work
+The Proteus Finance Project will tap into the latest technologies and developments in the DeFi space to open decentralized investments to everyone.It will address the problem that only the tech-savvy can currently access the
+benefits of this new financial system.
 
 <br />
 
+## Protesus TokenNomics
 
-## Enviorment Setup
+- Selected VCs and value-added investors. Linear monthly vesting for 18 months . Price: $0.03 per token. the percentage of seed is 8 percent 
 
-```sh
-git clone --depth 1 https://github.com/terra-money/localterra
-```
+- IDOs for Terra communities and Vesting terms will vary – 6 – 8 months or Price: $0.06 per token. And percentage of Ido 4 percent.
 
-so first clone the repo for setting terra
+- Rewards for Proteus stakers and LP stakers. Only enough tokens will be unlocked to subsidize initial Proteus staking rewards until Proteus Finance earns enough yield fees to pay rewards from that source and its percntage is  25 percent.
 
-```sh
-cd localterra
-```
+- Payouts for insurance holders Tokens will be released for the investors if insurance is needed and the Insurance percentage is 20 percent.
 
-- go to the terra folder
+- Token allocation to Proteus Finance core team .8% vested monthly from the 10th month after the TGE. Last month 4%.
+(23 months total vesting period). and its total percentage will be 18 percent.
 
-```sh
-docker-compose up
-```
+- Token allocation to Proteus Finance Advisors 5% vested monthly from the 3th month after the TGE (23 months total
+vesting period) and advisor total percentage will be 2 percent.
 
-- run the docker in your system by above command
-- and follow the blow commands step by step
+- Funding of Proteus projects by the community 10 % vested monthly from 6th month after the TGE (16 months total
+vesting period). and launchpad total percntage will be 17 percnet.
 
-```sh
-rustup default stable
-rustup target add wasm32-unknown-unknown
-cargo install cargo-generate --features vendored-openssl
-cargo install cargo-run-script
-```
+- Liquidity for Terraswap for Proteus-side . Tokens will be locked in DEXs (Proteus/UST).
 
-## Build Project
 
-- now we will see the steps to build the projecct so you need to follow bellow steps to compile the code
+## Proteus Staking
 
-```sh
-cargo wasm
-```
+- there are two feature for staking.
+- one is locked staking and one is unlocked staking.
+- in locked staking staker cant witdraw if time not completed.
+- in  staking staker cant witdraw when he want .
+- bridging and fee will be charge on tire base.
 
-- thats command will build the project and make target folder in your project.
 
-```sh
-cargo run-script optimize
-```
-
-- this command will genrate artifact file in your folder and this folder have cw20.wasm file
-
-## Deploy Project on Terra
-
-- now the time to deploy the smart contract on terra .
-- so open the terra station
-- https://station.terra.money/contract
-- upload your wasm on terra station
-- open the transaction on terra explorer
-- copy the code etc "3240"
-- then come back to terrastation and click to instantiate
-- enter code and init msg this init msg will be in json.
-- and confirm the trnasaction
-- so now you deployed succesfully smart contract on terra blockchain
-
----
-
-## Seed
-
-- Seed function **_have 8_** percent of token supply
-- Seed function will take one parameter  recipient address thats will be in String
-- Seed will directly start after deployment.
-- Seed function will not work after 18 months of token deployment
-
-## IDO
-
-- IDO function **_have 4_** percent of token supply.
-- IDO function will take one parameter  recipient  address thats will be in String.
-- IDO function will work from 6 to 8 momth .
-
-## Staking Fund
-
-- Staking function **_have 25_** percent of token supply.
-- Staking function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
-
-## Team
-
-- Team function **_have 18_** percent of token supply.
-- Team function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
-- Every month only **10 percent amount** of 20 percent of token can be through teaming.
-- Team function will not work after 23 months of token deployment.
-- Team function only will work after the six months of deployment of token.
-
-## Advisor
-
-- Advisor function **_have 2_** percent of token supply.
-- Advisor function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
-- Every month only **10 percent amount** of 2 percent of token can be through advising.
-- Advisor function will not work after 13 months of token deployment.
-- Advisor function only will work after the six months of deployment of token.
-
-## Launchpad
-
-- Launchpad function **_have 17_** percent of token supply.
-- Launchpad function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
-- Every month only **10 percent amount** of 15 percent of token can be through advising.
-- Launchpad function will not work after 16 months of token deployment.
-- Launchpad function only will work after the six months of deployment of token.
-
-## Liquidity
-
-- Liquidity function **_have 6_** percent of token supply.
-- Liquidity function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
-
-## Insurance
-
-- Insurance function **_have 2_** percent of token supply.
-- Insurance function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
 

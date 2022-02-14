@@ -1,0 +1,6 @@
+c45a72b04a2ed4cbc99763959db0e92350b4d865db14fe13aca9ca3c090cf2dd  ./target/wasm32-unknown-unknown/release/nexus_airdrop.wasm
+ff3cebcb84951069b34065fb54b3e05147e13633a2ca9f7b5658994229191d38  ./target/wasm32-unknown-unknown/release/nexus_community.wasm
+4f79bd4b1a7b503b4815142d4775b8ab660b7dcd2ed845feba3cd83d9ab9db5e  ./target/wasm32-unknown-unknown/release/nexus_governance.wasm
+9a175698094f91cdba5ce84f1d95e3995dc09bc9380936167f4e2403d3f36bdc  ./target/wasm32-unknown-unknown/release/nexus_staking.wasm
+e9288ab853fe1808b7ec64fc31733d8f420128b1d9be6ce8c44872d90bd487e3  ./target/wasm32-unknown-unknown/release/nexus_vesting.wasm
+f17b90035e0197de1887d1e4c2e1388bbcde7a6ade8a5baf8b009258fa36f7ca  ./target/wasm32-unknown-unknown/release/proteus_staking.wasm
