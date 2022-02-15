@@ -17,17 +17,13 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{MinterData, TokenInfo, BALANCES, LOGO, MARKETING_INFO, TOKEN_INFO};
 
-// version info for migration info
+
 const CONTRACT_NAME: &str = "crates.io:cw20-base";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-//static NUM: i32 = 18;
-//static mut Total_seed: Uint128= Uint128::new(80000000);
-//static Total_seed: Uint128=80000000 as Uint128;
+
 const LOGO_SIZE_CAP: usize = 5 * 1024;
 
-// let TimeStart ;
-// let TimeEnd;
-/// Checks if data starts with XML preamble
+
 fn verify_xml_preamble(data: &[u8]) -> Result<(), ContractError> {
     // The easiest way to perform this check would be just match on regex, however regex
     // compilation is heavy and probably not worth it.
@@ -126,7 +122,6 @@ pub fn instantiate(
     let _launch_pad = (_cap * Uint128::new(17))/Uint128::new(100);
     let _liquidity = (_cap * Uint128::new(6))/Uint128::new(100);
     let _start_time=_env.block.time.seconds() + 3*30*24*60*60;
-    //let _end_time=_env.block.time.seconds() + 23*30*24*60*60;
     let _end_time=_env.block.time.seconds() + 18*30*24*60*60;
     let _mothly_seed=(_seed_token_sale * Uint128::new(5))/Uint128::new(100);
     let _three_month_period=_env.block.time.seconds() + 3*30*24*60*60;
@@ -161,7 +156,6 @@ pub fn instantiate(
         liquidity: _liquidity,
         owner:_info.sender,
         end_time:_end_time,
-       // month:_three_month_period,
         monthly_seed:_mothly_seed,
         monthly_seed_remain:_mothly_seed,
         three_month_period:_three_month_period,
@@ -215,8 +209,7 @@ pub fn instantiate(
         };
         MARKETING_INFO.save(deps.storage, &data)?;
     }
-    // TimeStart=env.block.time.seconds();
-    // TimeEnd=env.block.time.seconds() + 23*30*24*60*60;
+   ;
 
     Ok(Response::default())
 }
@@ -389,7 +382,7 @@ pub fn execute_request(
         return Err(ContractError::InvalidAmountSeed {});
     }
     let decimal_value=Uint128::new(1000000000);
-    let amount2= amount * decimal_value ;
+    let token_amount= amount * decimal_value ;
     if config.owner != info.sender 
     {
         return Err(ContractError::Unauthorized {}); 
@@ -409,13 +402,13 @@ pub fn execute_request(
     BALANCES.update(
         deps.storage,
         &rcpt_addr,
-        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
     )?;
 
     let res = Response::new()
         .add_attribute("action", "request")
         .add_attribute("to", recipient)
-        .add_attribute("amount", amount2);
+        .add_attribute("amount", token_amount);
     Ok(res)
 
 
@@ -425,10 +418,9 @@ pub fn execute_seed(
     _env: Env,
     info: MessageInfo,
     recipient: String,
- //   amount: Uint128,
 )-> Result<Response,ContractError>
 {
-    let price = Uint128::new(30000); 
+    let price = Uint128::new(30000); // its value is 0.03 luna
     let coin = &info.funds[0];
     if  coin.amount == Uint128::zero() 
     {
@@ -438,17 +430,12 @@ pub fn execute_seed(
     let amount = coin.amount/price;
     let decimal_value=Uint128::new(1000000000);
  
-    let amount2= decimal_value.multiply_ratio(coin.amount , price);
+    let token_amount= decimal_value.multiply_ratio(coin.amount , price);
 
     
     let mut config = TOKEN_INFO.load(deps.storage)?;
 
    let time = _env.block.time.seconds();
-
-    // if time < config.three_month_period {
-
-    //     return Err(ContractError::InvalidTime {});
-    // }
 
     if amount == Uint128::zero() {
         return Err(ContractError::InvalidZeroAmount {});
@@ -464,17 +451,9 @@ pub fn execute_seed(
         return Err(ContractError::TimeEnd {});
     }
 
-    // if config.next_month > time 
-    // {
-    
-        // if config.start_month < time &&  config.next_month > time 
-        // {
-          
-        // if amount <= config.monthly_seed_remain
-        // {
+   
              
         config.seed_token_sale -= amount;
-        // config.monthly_seed_remain -= amount;
         config.total_supply += amount;
         if let Some(limit) = config.get_cap() {
             if config.total_supply > limit {
@@ -488,60 +467,16 @@ pub fn execute_seed(
         BALANCES.update(
             deps.storage,
             &rcpt_addr,
-            |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+            |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
         )?;
 
         let res = Response::new()
             .add_attribute("action", "seed")
             .add_attribute("to", recipient)
-            .add_attribute("amount", amount2);
+            .add_attribute("amount", token_amount);
         Ok(res)
 
-       // } 
-        // else
-        // {
-        //     return Err(ContractError::InvalidAmountSeed {});
-        // }
-     
-        // } else
-
-        // {
-        //     return Err(ContractError::InvalidZeroAmount {});
-            
-        // }
-   // }
-
-//     else {
-//         config.next_month += 30*24*60*60;
-//         config.start_month += 30*24*60*60;
-//         let mut  _reamin_seed = config.monthly_seed - amount;
-//         config.seed_token_sale -= amount;
-//        // config.monthly_seed_remain = Uint128::new(0);
-//        // config.monthly_seed_remain = config.monthly_seed;
-//         config.monthly_seed_remain =  _reamin_seed;
-//         config.total_supply += amount;
-//         if let Some(limit) = config.get_cap() {
-//             if config.total_supply > limit {
-//                 return Err(ContractError::CannotExceedCap {});
-//             }
-//         }
-//         TOKEN_INFO.save(deps.storage, &config)?;
-
-//         // add amount to recipient balance
-//         let rcpt_addr = deps.api.addr_validate(&recipient)?;
-//         BALANCES.update(
-//             deps.storage,
-//             &rcpt_addr,
-//             |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
-//         )?;
-
-//         let res = Response::new()
-//             .add_attribute("action", "seed")
-//             .add_attribute("to", recipient)
-//             .add_attribute("amount", amount2);
-//         Ok(res)
-
-//    }
+    
    
 
 }
@@ -564,7 +499,7 @@ pub fn execute_liquidity(
         return Err(ContractError::Unauthorized {}); 
     } 
     let decimal_value=Uint128::new(1000000000);
-    let amount2= amount * decimal_value ;
+    let token_amount= amount * decimal_value ;
 
     if config.liquidity < amount
     {
@@ -572,7 +507,7 @@ pub fn execute_liquidity(
     }
     else{
         config.liquidity -= amount ;
-  //  TOKEN_INFO.save(deps.storage, &config)?;
+  
 
    // update supply and enforce cap
    config.total_supply += amount;
@@ -589,14 +524,14 @@ pub fn execute_liquidity(
    BALANCES.update(
        deps.storage,
        &rcpt_addr,
-       |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+       |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
    )?;
 
     let res = Response::new()
         .add_attribute("action", "liquidity")
         .add_attribute("from", info.sender)
         .add_attribute("to", recipient)
-        .add_attribute("amount", amount2);
+        .add_attribute("amount", token_amount);
     Ok(res)
 }
     }
@@ -639,7 +574,7 @@ pub fn execute_liquidity(
             return Err(ContractError::TimeEnd {});
         }
         let decimal_value=Uint128::new(1000000000);
-        let amount2= amount * decimal_value ;
+        let token_amount= amount * decimal_value ;
 
         if config.next_month_advisor > time 
         {
@@ -650,7 +585,6 @@ pub fn execute_liquidity(
                     config.monthly_advisor_amount_remain -= amount ;
                     config.advisors -= amount ;
                    
-                    //TOKEN_INFO.save(deps.storage, &config)?;
                 
                  config.total_supply += amount;
              if let Some(limit) = config.get_cap() {
@@ -665,14 +599,14 @@ pub fn execute_liquidity(
     BALANCES.update(
         deps.storage,
         &rcpt_addr,
-        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
     )?;
         
             let res = Response::new()
                 .add_attribute("action", "advisor")
                 .add_attribute("from", info.sender)
                 .add_attribute("to", recipient)
-                .add_attribute("amount", amount2);
+                .add_attribute("amount", token_amount);
             Ok(res)
                 }
                 else
@@ -691,13 +625,8 @@ pub fn execute_liquidity(
             config.start_month_advisor += 30*24*60*60;
             config.next_month_advisor  += 30*24*60*60;
             let mut  _reamin_amount = config.monthly_advisor_amount - amount;
-            // _reamin_amount = config.monthly_advisor_amount - amount;
             config.monthly_advisor_amount_remain = _reamin_amount;
             config.advisors -= amount ;
-        
-           // TOKEN_INFO.save(deps.storage, &config)?;
-        
-             // update supply and enforce cap
     config.total_supply += amount;
     if let Some(limit) = config.get_cap() {
         if config.total_supply > limit {
@@ -711,14 +640,14 @@ pub fn execute_liquidity(
     BALANCES.update(
         deps.storage,
         &rcpt_addr,
-        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
     )?;
         
             let res = Response::new()
                 .add_attribute("action", "advisor")
                 .add_attribute("from", info.sender)
                 .add_attribute("to", recipient)
-                .add_attribute("amount", amount2);
+                .add_attribute("amount", token_amount);
             Ok(res)
         }
     }
@@ -759,7 +688,7 @@ pub fn execute_launch(
         return Err(ContractError::TimeEnd {});
     }
     let decimal_value=Uint128::new(1000000000);
-    let amount2= amount * decimal_value ;
+    let token_amount= amount * decimal_value ;
 
     if config.launch_pad_next_month > time 
     {
@@ -770,7 +699,7 @@ pub fn execute_launch(
                 config.launch_pad_amount_remain -= amount ;
                 config.launch_pad -= amount ;
                
-             //   TOKEN_INFO.save(deps.storage, &config)?;
+             
             
              config.total_supply += amount;
              if let Some(limit) = config.get_cap() {
@@ -780,19 +709,18 @@ pub fn execute_launch(
              }
              TOKEN_INFO.save(deps.storage, &config)?;
          
-             // add amount to recipient balance
              let rcpt_addr = deps.api.addr_validate(&recipient)?;
              BALANCES.update(
                  deps.storage,
                  &rcpt_addr,
-                 |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+                 |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
              )?;
                  
                      let res = Response::new()
                          .add_attribute("action", "launch")
                          .add_attribute("from", info.sender)
                          .add_attribute("to", recipient)
-                         .add_attribute("amount", amount2);
+                         .add_attribute("amount", token_amount);
                      Ok(res)
             }
             else
@@ -811,11 +739,8 @@ pub fn execute_launch(
         config.launch_pad_start_month += 300;
         config.launch_pad_next_month += 300;
         let mut  _reamin_amount = config.launch_pad_amount_monthly - amount;
-        // _reamin_amount = config.monthly_advisor_amount - amount;
         config.launch_pad_amount_remain = _reamin_amount;
         config.launch_pad -= amount ;
-    
-       // TOKEN_INFO.save(deps.storage, &config)?;
     
          // update supply and enforce cap
 config.total_supply += amount;
@@ -831,14 +756,14 @@ let rcpt_addr = deps.api.addr_validate(&recipient)?;
 BALANCES.update(
     deps.storage,
     &rcpt_addr,
-    |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+    |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
 )?;
     
         let res = Response::new()
             .add_attribute("action", "launch")
             .add_attribute("from", info.sender)
             .add_attribute("to", recipient)
-            .add_attribute("amount", amount2);
+            .add_attribute("amount", token_amount);
         Ok(res)
     }
 
@@ -880,7 +805,7 @@ pub fn execute_team(
         return Err(ContractError::TimeEnd {});
     }
     let decimal_value=Uint128::new(1000000000);
-        let amount2= amount * decimal_value ;
+        let token_amount= amount * decimal_value ;
 
     if config.team_next_month > time 
     {
@@ -890,8 +815,6 @@ pub fn execute_team(
             {
                 config.team_amount_monthly_remain -= amount ;
                 config.team -= amount ;
-               
-             //   TOKEN_INFO.save(deps.storage, &config)?;
             
              config.total_supply += amount;
              if let Some(limit) = config.get_cap() {
@@ -906,14 +829,14 @@ pub fn execute_team(
              BALANCES.update(
                  deps.storage,
                  &rcpt_addr,
-                 |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+                 |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
              )?;
                  
                      let res = Response::new()
                          .add_attribute("action", "team")
                          .add_attribute("from", info.sender)
                          .add_attribute("to", recipient)
-                         .add_attribute("amount", amount2);
+                         .add_attribute("amount", token_amount);
                      Ok(res)
             }
             else
@@ -932,11 +855,8 @@ pub fn execute_team(
         config.team_start_month += 30*24*60*60;
         config.team_next_month += 30*24*60*60;
         let mut  _reamin_amount = config.team_amount_monthly - amount;
-        // _reamin_amount = config.monthly_advisor_amount - amount;
         config.team_amount_monthly_remain = _reamin_amount;
         config.team -= amount ;
-    
-       // TOKEN_INFO.save(deps.storage, &config)?;
     
          // update supply and enforce cap
 config.total_supply += amount;
@@ -952,14 +872,14 @@ let rcpt_addr = deps.api.addr_validate(&recipient)?;
 BALANCES.update(
     deps.storage,
     &rcpt_addr,
-    |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+    |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
 )?;
     
         let res = Response::new()
             .add_attribute("action", "team")
             .add_attribute("from", info.sender)
             .add_attribute("to", recipient)
-            .add_attribute("amount", amount2);
+            .add_attribute("amount", token_amount);
         Ok(res)
     }
 
@@ -983,7 +903,7 @@ pub fn execute_insurance(
         return Err(ContractError::Unauthorized {}); 
     }
     let decimal_value=Uint128::new(1000000000);
-        let amount2= amount * decimal_value ;
+        let token_amount= amount * decimal_value ;
 
     if config.insurance_funds < amount
     {
@@ -991,7 +911,6 @@ pub fn execute_insurance(
     }
     else{
         config.insurance_funds -= amount ;
-  //  TOKEN_INFO.save(deps.storage, &config)?;
 
    // update supply and enforce cap
    config.total_supply += amount;
@@ -1007,14 +926,14 @@ pub fn execute_insurance(
    BALANCES.update(
        deps.storage,
        &rcpt_addr,
-       |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+       |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
    )?;
 
     let res = Response::new()
         .add_attribute("action", "insurance")
         .add_attribute("from", info.sender)
         .add_attribute("to", recipient)
-        .add_attribute("amount", amount2);
+        .add_attribute("amount", token_amount);
     Ok(res)
 }
     }
@@ -1037,7 +956,7 @@ pub fn execute_insurance(
             return Err(ContractError::Unauthorized {}); 
         }
         let decimal_value=Uint128::new(1000000000);
-        let amount2= amount * decimal_value ;
+        let token_amount= amount * decimal_value ;
     
         if config.staking_funds < amount
         {
@@ -1047,7 +966,6 @@ pub fn execute_insurance(
 
         else{
             config.staking_funds -= amount ;
-      //  TOKEN_INFO.save(deps.storage, &config)?;
     
        // update supply and enforce cap
        config.total_supply += amount;
@@ -1063,14 +981,14 @@ pub fn execute_insurance(
        BALANCES.update(
            deps.storage,
            &rcpt_addr,
-           |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+           |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
        )?;
     
         let res = Response::new()
             .add_attribute("action", "staking")
             .add_attribute("from", info.sender)
             .add_attribute("to", recipient)
-            .add_attribute("amount", amount2);
+            .add_attribute("amount", token_amount);
         Ok(res)
     }
         }
@@ -1093,7 +1011,7 @@ pub fn execute_insurance(
 
     let amount = coin.amount/price;
     let decimal_value=Uint128::new(1000000000);
-    let amount2= decimal_value.multiply_ratio(coin.amount , price);
+    let token_amount= decimal_value.multiply_ratio(coin.amount , price);
 
     if amount == Uint128::zero() {
 
@@ -1126,14 +1044,14 @@ pub fn execute_insurance(
        BALANCES.update(
            deps.storage,
            &rcpt_addr,
-           |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount2) },
+           |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + token_amount) },
        )?;
     
         let res = Response::new()
             .add_attribute("action", "ido")
             .add_attribute("from", info.sender)
             .add_attribute("to", recipient)
-            .add_attribute("amount", amount2);
+            .add_attribute("amount", token_amount);
         Ok(res)
             
         }
@@ -1433,30 +1351,6 @@ mod tests {
     }
 
     // this will set up the instantiation for other tests
-    // fn do_instantiate_with_minter(
-    //     deps: DepsMut,
-    //     addr: &str,
-    //     amount: Uint128,
-    //     minter: &str,
-    //     cap: Option<Uint128>,
-    // ) -> TokenInfoResponse {
-    //     _do_instantiate(
-    //         deps,
-    //         addr,
-    //         amount,
-    //         Some(MinterResponse {
-    //             minter: minter.to_string(),
-    //             cap,
-    //         }),
-    //     )
-    // }
-
-    // this will set up the instantiation for other tests
-    // fn do_instantiate(deps: DepsMut, addr: &str, amount: Uint128) -> TokenInfoResponse {
-    //     _do_instantiate(deps, addr, amount, None)
-    // }
-
-    // this will set up the instantiation for other tests
     fn _do_instantiate(
         mut deps: DepsMut,
         addr: &str,
@@ -1548,9 +1442,8 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Seed {
-           // let addr1=String::from("addr0123")
+        
                  recipient:addr1 ,
-                 //amount: transfer,
             };
             
         }
@@ -1572,14 +1465,11 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Ido {
-           // let addr1=String::from("addr0123")
+
                  recipient:addr1 ,
-                 //amount: transfer,
             };
             let _info = mock_info("creator", &[]);
             let _env = mock_env();
-            // let err = execute(deps.as_mut(), env, info, msg).unwrap_err();
-            // assert_eq!(0, err.len());
             
         }
         #[test]
@@ -1600,7 +1490,7 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Liquidity {
-           // let addr1=String::from("addr0123")
+           
                  recipient:addr1 ,
                  amount:amount,
             };
@@ -1624,7 +1514,7 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Advisor {
-           // let addr1=String::from("addr0123")
+           
                  recipient:addr1 ,
                  amount:amount,
             };
@@ -1649,7 +1539,6 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Staking {
-           // let addr1=String::from("addr0123")
                  recipient:addr1 ,
                  amount:amount,
             };
@@ -1674,7 +1563,6 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Team{
-           // let addr1=String::from("addr0123")
                  recipient:addr1 ,
                  amount:amount,
             };
@@ -1706,48 +1594,6 @@ mod tests {
             let env = mock_env();
             let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
             assert_eq!(0, res.messages.len());
-
-            // assert_eq!(
-            //     query_token_info(deps.as_ref()).unwrap(),
-            //     TokenInfoResponse {
-            //         name: "Proteus Token".to_string(),
-            //         symbol: "PROTEUS".to_string(),
-            //         decimals: 9,
-            //         total_supply: amount,
-            //         seed_token_sale:Uint128::new (900000 ),
-            //         ido:Uint128::new(400000)  ,
-            //         insurance_funds:Uint128::new(50000) ,
-            //         team:Uint128::new(5000),
-            //         advisors:Uint128::new(50000) ,
-            //         launch_pad:Uint128::new (5000),
-            //         liquidity:Uint128::new(500000),
-            //         staking_funds:Uint128::new(6000000),
-            //         owner:Addr::unchecked("addr0001"),
-            //         end_time:1200,
-            //         start_month:300,
-            //         monthly_seed:Uint128::new(40000),
-            //         monthly_seed_remain:Uint128::new(4000) ,
-            //         three_month_period:300,
-            //         next_month:600,
-            //         next_month_advisor:600,
-            //         start_month_advisor:300,
-            //         end_month_advisor:1200,
-            //         monthly_advisor_amount:Uint128::new(6000),
-            //         monthly_advisor_amount_remain:Uint128::new(60000),
-            //         launch_pad_amount_monthly:Uint128::new(5000) ,
-            //         launch_pad_amount_remain:Uint128::new(5000),
-            //         launch_pad_end_month:1200,
-            //         launch_pad_next_month:600,
-            //         launch_pad_start_month:300,
-            //         team_amount_monthly:Uint128::new(4000) ,
-            //         team_amount_monthly_remain:Uint128::new(4000) ,
-            //         team_end_month:1200,
-            //         team_start_month:300,
-            //         team_next_month:600,
-            //         ido_start_month:300,
-            //         ido_end_month:600,
-            //     }
-            // );
             assert_eq!(
                 get_balance(deps.as_ref(), "addr0000"),
                 Uint128::new(11223344)
@@ -1778,48 +1624,6 @@ mod tests {
             let env = mock_env();
             let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
             assert_eq!(0, res.messages.len());
-
-            // assert_eq!(
-            //     query_token_info(deps.as_ref()).unwrap(),
-            //     TokenInfoResponse {
-            //         name: "Proteus Token".to_string(),
-            //         symbol: "PROTEUS".to_string(),
-            //         decimals: 9,
-            //         total_supply: amount,
-            //         seed_token_sale:Uint128::new (900000 ),
-            //         ido:Uint128::new(400000)  ,
-            //         insurance_funds:Uint128::new(50000) ,
-            //         team:Uint128::new(5000),
-            //         advisors:Uint128::new(50000) ,
-            //         launch_pad:Uint128::new (5000),
-            //         liquidity:Uint128::new(500000),
-            //         staking_funds:Uint128::new(6000000),
-            //         owner:Addr::unchecked("addr0001"),
-            //         end_time:1200,
-            //         start_month:300,
-            //         monthly_seed:Uint128::new(40000),
-            //         monthly_seed_remain:Uint128::new(4000) ,
-            //         three_month_period:300,
-            //         next_month:600,
-            //         next_month_advisor:600,
-            //         start_month_advisor:300,
-            //         end_month_advisor:1200,
-            //         monthly_advisor_amount:Uint128::new(6000),
-            //         monthly_advisor_amount_remain:Uint128::new(60000),
-            //         launch_pad_amount_monthly:Uint128::new(5000) ,
-            //         launch_pad_amount_remain:Uint128::new(5000),
-            //         launch_pad_end_month:1200,
-            //         launch_pad_next_month:600,
-            //         launch_pad_start_month:300,
-            //         team_amount_monthly:Uint128::new(4000) ,
-            //         team_amount_monthly_remain:Uint128::new(4000) ,
-            //         team_end_month:1200,
-            //         team_start_month:300,
-            //         team_next_month:600,
-            //         ido_start_month:300,
-            //         ido_end_month:600,
-            //     }
-            // );
             assert_eq!(
                 get_balance(deps.as_ref(), "addr0000"),
                 Uint128::new(11223344)
@@ -1941,8 +1745,6 @@ mod tests {
         let mut deps = mock_dependencies(&[]);
         let minter = String::from("asmodat");
         let _limit = Uint128::new(2000000000);
-    //    do_instantiate_with_minter(deps.as_mut(), &genesis, amount, &minter, Some(limit));
-
         // minter can mint coins to some winner
         let winner = String::from("lucky");
         let prize = Uint128::new(222_222_222);
@@ -1953,11 +1755,6 @@ mod tests {
 
         let _info = mock_info(minter.as_ref(), &[]);
         let _env = mock_env();
-        // let res = execute(deps.as_mut(), env, info, msg).unwrap();
-        // assert_eq!(0, res.messages.len());
-        // assert_eq!(get_balance(deps.as_ref(), genesis), amount);
-        // assert_eq!(get_balance(deps.as_ref(), winner.clone()), prize);
-
         // but cannot mint nothing
         let msg = ExecuteMsg::Mint {
             recipient: winner.clone(),
@@ -1967,30 +1764,11 @@ mod tests {
         let env = mock_env();
         let err = execute(deps.as_mut(), env, info, msg).unwrap_err();
         assert_eq!(err, ContractError::InvalidZeroAmount {});
-
-        // // but if it exceeds cap (even over multiple rounds), it fails
-        // // cap is enforced
-        // let msg = ExecuteMsg::Mint {
-        //     recipient: winner,
-        //     amount: Uint128::new(333_222_222),
-        // };
-        // let info = mock_info(minter.as_ref(), &[]);
-        // let env = mock_env();
-        // let err = execute(deps.as_mut(), env, info, msg).unwrap_err();
-        // assert_eq!(err, ContractError::CannotExceedCap {});
     }
 
     #[test]
     fn others_cannot_mint() {
         let mut deps = mock_dependencies(&[]);
-        // do_instantiate_with_minter(
-        //     deps.as_mut(),
-        //     &String::from("genesis"),
-        //     Uint128::new(1234),
-        //     &String::from("minter"),
-        //     None,
-        // );
-
         let msg = ExecuteMsg::Mint {
             recipient: String::from("lucky"),
             amount: Uint128::new(222),
@@ -1998,7 +1776,7 @@ mod tests {
         let info = mock_info("anyone else", &[]);
         let env = mock_env();
         let _err = execute(deps.as_mut(), env, info, msg).unwrap_err();
-     //   assert_eq!(err, ContractError::Unauthorized {});
+     
     }
 
     #[test]
@@ -2042,48 +1820,6 @@ mod tests {
         let env = mock_env();
         let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
         assert_eq!(0, res.messages.len());
-
-        // assert_eq!(
-        //     query_token_info(deps.as_ref()).unwrap(),
-        //     TokenInfoResponse {
-        //         name: "Proteus Token".to_string(),
-        //         symbol: "PROTEUS".to_string(),
-        //         decimals: 9,
-        //         total_supply: amount1 + amount2,
-        //         seed_token_sale:Uint128::new (900000 ),
-        //         ido:Uint128::new(400000)  ,
-        //         insurance_funds:Uint128::new(50000) ,
-        //         team:Uint128::new(5000),
-        //         advisors:Uint128::new(50000) ,
-        //         launch_pad:Uint128::new (5000),
-        //         liquidity:Uint128::new(500000),
-        //         staking_funds:Uint128::new(6000000),
-        //         owner:Addr::unchecked("addr0001"),
-        //         end_time:1200,
-        //         start_month:300,
-        //         monthly_seed:Uint128::new(40000),
-        //         monthly_seed_remain:Uint128::new(4000) ,
-        //         three_month_period:300,
-        //         next_month:600,
-        //         next_month_advisor:600,
-        //         start_month_advisor:300,
-        //         end_month_advisor:1200,
-        //         monthly_advisor_amount:Uint128::new(6000),
-        //         monthly_advisor_amount_remain:Uint128::new(60000),
-        //         launch_pad_amount_monthly:Uint128::new(5000) ,
-        //         launch_pad_amount_remain:Uint128::new(5000),
-        //         launch_pad_end_month:1200,
-        //         launch_pad_next_month:600,
-        //         launch_pad_start_month:300,
-        //         team_amount_monthly:Uint128::new(4000) ,
-        //         team_amount_monthly_remain:Uint128::new(4000) ,
-        //         team_end_month:1200,
-        //         team_start_month:300,
-        //         team_next_month:600,
-        //         ido_start_month:300,
-        //         ido_end_month:600,
-        //     }
-        // );
         assert_eq!(get_balance(deps.as_ref(), addr1), amount1);
         assert_eq!(get_balance(deps.as_ref(), addr2), amount2);
     }
@@ -2161,45 +1897,6 @@ mod tests {
         let _burn = Uint128::from(76543u128);
         let _too_much = Uint128::from(12340321u128);
 
-      //  do_instantiate(deps.as_mut(), &addr1, amount1);
-
-        // // cannot burn nothing
-        // let info = mock_info(addr1.as_ref(), &[]);
-        // let env = mock_env();
-        // let msg = ExecuteMsg::Burn {
-        //     amount: Uint128::zero(),
-        // };
-        // let err = execute(deps.as_mut(), env, info, msg).unwrap_err();
-        // assert_eq!(err, ContractError::InvalidZeroAmount {});
-        // assert_eq!(
-        //     query_token_info(deps.as_ref()).unwrap().total_supply,
-        //     amount1
-        // );
-
-        // cannot burn more than we have
-        // let info = mock_info(addr1.as_ref(), &[]);
-        // let env = mock_env();
-        // let msg = ExecuteMsg::Burn { amount: too_much };
-        // let err = execute(deps.as_mut(), env, info, msg).unwrap_err();
-        // assert!(matches!(err, ContractError::Std(StdError::Overflow { .. })));
-        // assert_eq!(
-        //     query_token_info(deps.as_ref()).unwrap().total_supply,
-        //     amount1
-        // );
-
-        // // valid burn reduces total supply
-        // let info = mock_info(addr1.as_ref(), &[]);
-        // let env = mock_env();
-        // let msg = ExecuteMsg::Burn { amount: burn };
-        // let res = execute(deps.as_mut(), env, info, msg).unwrap();
-        // assert_eq!(res.messages.len(), 0);
-
-        // let remainder = amount1.checked_sub(burn).unwrap();
-        // assert_eq!(get_balance(deps.as_ref(), addr1), remainder);
-        // assert_eq!(
-        //     query_token_info(deps.as_ref()).unwrap().total_supply,
-        //     remainder
-        // );
     }
 
     #[test]
