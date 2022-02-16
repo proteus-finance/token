@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::logo::Logo;
-use cosmwasm_std::{Binary, Uint128};
+use cosmwasm_std::{Binary, Uint128,Addr};
 use cw0::Expiration;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -28,6 +28,8 @@ pub enum Cw20ExecuteMsg {
     Request { recipient: String, amount: Uint128 },
 
     Ido { recipient: String},
+
+    ChangeOwner{owner_address:Addr},
 
     /// Burn is a base message to destroy tokens forever
     Burn { amount: Uint128 },

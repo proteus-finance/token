@@ -60,7 +60,7 @@ pub struct TokenInfoResponse {
     pub name: String,
     pub symbol: String,
     pub decimals: u8,
-    pub total_supply: Uint128,
+    pub supply_limit:Uint128,
     pub seed_token_sale: Uint128,
     pub ido: Uint128,
     pub staking_funds: Uint128,
@@ -93,6 +93,7 @@ pub struct TokenInfoResponse {
     pub team_amount_monthly_remain:Uint128,
     pub ido_start_month:u64,
     pub ido_end_month:u64,
+    pub total_supply: Uint128,
 
 }
 

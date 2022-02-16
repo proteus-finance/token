@@ -1,1 +1,3 @@
-2eb71c78b9fd6c6ade28a9f489c77d4a060212c27d2c01960ef313232a7a3e1f  ./target/wasm32-unknown-unknown/release/cw20_base.wasm
+dd76b2aeefc3d08c710e30becdccc0f1d84d777f61b5bad4c8c84b524ea066cc  ./target/wasm32-unknown-unknown/release/cw20_base.wasm
+c25feeb14282483c47618a45e05a2d82b7d8963b5c1f5d9ad3d5cea0947f2e94  ./target/wasm32-unknown-unknown/release/my_first_contract.wasm
+4915abbee59595c25f0adaaadfb2089da728ae712c82cf2045f38bfecb50a192  ./target/wasm32-unknown-unknown/release/staking.wasm

@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Uint128,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Uint128,Addr,
 };
 use cw2::set_contract_version;
 use cw20::{
@@ -17,13 +17,14 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{MinterData, TokenInfo, BALANCES, LOGO, MARKETING_INFO, TOKEN_INFO};
 
-
+// version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw20-base";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const LOGO_SIZE_CAP: usize = 5 * 1024;
 
 
+/// Checks if data starts with XML preamble
 fn verify_xml_preamble(data: &[u8]) -> Result<(), ContractError> {
     // The easiest way to perform this check would be just match on regex, however regex
     // compilation is heavy and probably not worth it.
@@ -96,23 +97,17 @@ pub fn instantiate(
     msg.validate()?;
     // create initial accounts
     let total_supply = create_accounts(&mut deps, &msg.initial_balances)?;
-
     if let Some(limit) = msg.get_cap() {
         if total_supply > limit {
             return Err(StdError::generic_err("Initial supply greater than cap").into());
         }
+        
     }
     
-    let mint = match msg.mint {
-        Some(m) => Some(MinterData {
-            minter: deps.api.addr_validate(&m.minter)?,
-            cap: m.cap,
-        }),
-        None => None,
-    };
+   
+     
 
-
-    let _cap = Uint128::new(1000000000);
+    let _cap = msg.supply_limit;
     let _seed_token_sale = (_cap * Uint128::new(8))/Uint128::new(100);
     let _ido = (_cap * Uint128::new(4))/Uint128::new(100);
     let _staking_funds = (_cap * Uint128::new(25))/Uint128::new(100);
@@ -137,6 +132,16 @@ pub fn instantiate(
     let _team_next_month = _env.block.time.seconds() + 7*30*24*60*60;
     let _ido_start_month = _env.block.time.seconds() + 6*30*24*60*60 ;
     let _ido_end_month   =   _env.block.time.seconds() + 8*30*24*60*60;
+
+
+    let mint = match msg.mint {
+        Some( m) => Some(MinterData {
+            minter: deps.api.addr_validate(&m.minter)?,
+            cap: m.cap,
+        }),
+        None => None,
+
+    };
 
 
     // store token info
@@ -178,12 +183,15 @@ pub fn instantiate(
         team_amount_monthly_remain:_team_amount_monthly,
         ido_start_month:_ido_start_month,
         ido_end_month:_ido_end_month,
+        supply_limit:msg.supply_limit,
 
 
 
         
     };
     TOKEN_INFO.save(deps.storage, &data)?;
+
+   
 
     if let Some(marketing) = msg.marketing {
         let logo = if let Some(logo) = marketing.logo {
@@ -209,7 +217,7 @@ pub fn instantiate(
         };
         MARKETING_INFO.save(deps.storage, &data)?;
     }
-   ;
+    
 
     Ok(Response::default())
 }
@@ -235,6 +243,10 @@ pub fn execute(
         ExecuteMsg::Liquidity { recipient, amount } => {
             execute_liquidity(deps, env, info, recipient, amount)
         }
+        ExecuteMsg::ChangeOwner { owner_address } => {
+            execute_change_ownership(deps, env, info, owner_address, )
+        }
+
         ExecuteMsg::Request { recipient, amount } => {
             execute_request(deps, env, info, recipient, amount)
         }
@@ -300,6 +312,8 @@ pub fn execute(
         ExecuteMsg::UploadLogo(logo) => execute_upload_logo(deps, env, info, logo),
     }
 }
+
+
 
 pub fn execute_transfer(
     deps: DepsMut,
@@ -381,7 +395,7 @@ pub fn execute_request(
     {
         return Err(ContractError::InvalidAmountSeed {});
     }
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
     let token_amount= amount * decimal_value ;
     if config.owner != info.sender 
     {
@@ -420,20 +434,20 @@ pub fn execute_seed(
     recipient: String,
 )-> Result<Response,ContractError>
 {
-    let price = Uint128::new(30000); // its value is 0.03 luna
+    let price = Uint128::new(30000); 
     let coin = &info.funds[0];
     if  coin.amount == Uint128::zero() 
     {
         return Err(ContractError::PriceToken {}); 
     }
-
+    let mut config = TOKEN_INFO.load(deps.storage)?;
     let amount = coin.amount/price;
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
  
     let token_amount= decimal_value.multiply_ratio(coin.amount , price);
 
     
-    let mut config = TOKEN_INFO.load(deps.storage)?;
+    
 
    let time = _env.block.time.seconds();
 
@@ -451,9 +465,9 @@ pub fn execute_seed(
         return Err(ContractError::TimeEnd {});
     }
 
-   
              
         config.seed_token_sale -= amount;
+
         config.total_supply += amount;
         if let Some(limit) = config.get_cap() {
             if config.total_supply > limit {
@@ -475,8 +489,6 @@ pub fn execute_seed(
             .add_attribute("to", recipient)
             .add_attribute("amount", token_amount);
         Ok(res)
-
-    
    
 
 }
@@ -498,7 +510,7 @@ pub fn execute_liquidity(
     {
         return Err(ContractError::Unauthorized {}); 
     } 
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
     let token_amount= amount * decimal_value ;
 
     if config.liquidity < amount
@@ -573,7 +585,7 @@ pub fn execute_liquidity(
         {
             return Err(ContractError::TimeEnd {});
         }
-        let decimal_value=Uint128::new(1000000000);
+        let decimal_value=config.supply_limit;
         let token_amount= amount * decimal_value ;
 
         if config.next_month_advisor > time 
@@ -625,8 +637,13 @@ pub fn execute_liquidity(
             config.start_month_advisor += 30*24*60*60;
             config.next_month_advisor  += 30*24*60*60;
             let mut  _reamin_amount = config.monthly_advisor_amount - amount;
+            
             config.monthly_advisor_amount_remain = _reamin_amount;
             config.advisors -= amount ;
+        
+          
+        
+             // update supply and enforce cap
     config.total_supply += amount;
     if let Some(limit) = config.get_cap() {
         if config.total_supply > limit {
@@ -687,7 +704,7 @@ pub fn execute_launch(
     {
         return Err(ContractError::TimeEnd {});
     }
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
     let token_amount= amount * decimal_value ;
 
     if config.launch_pad_next_month > time 
@@ -699,7 +716,6 @@ pub fn execute_launch(
                 config.launch_pad_amount_remain -= amount ;
                 config.launch_pad -= amount ;
                
-             
             
              config.total_supply += amount;
              if let Some(limit) = config.get_cap() {
@@ -709,6 +725,7 @@ pub fn execute_launch(
              }
              TOKEN_INFO.save(deps.storage, &config)?;
          
+             // add amount to recipient balance
              let rcpt_addr = deps.api.addr_validate(&recipient)?;
              BALANCES.update(
                  deps.storage,
@@ -741,7 +758,6 @@ pub fn execute_launch(
         let mut  _reamin_amount = config.launch_pad_amount_monthly - amount;
         config.launch_pad_amount_remain = _reamin_amount;
         config.launch_pad -= amount ;
-    
          // update supply and enforce cap
 config.total_supply += amount;
 if let Some(limit) = config.get_cap() {
@@ -804,7 +820,7 @@ pub fn execute_team(
     {
         return Err(ContractError::TimeEnd {});
     }
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
         let token_amount= amount * decimal_value ;
 
     if config.team_next_month > time 
@@ -858,6 +874,7 @@ pub fn execute_team(
         config.team_amount_monthly_remain = _reamin_amount;
         config.team -= amount ;
     
+    
          // update supply and enforce cap
 config.total_supply += amount;
 if let Some(limit) = config.get_cap() {
@@ -902,7 +919,7 @@ pub fn execute_insurance(
     {
         return Err(ContractError::Unauthorized {}); 
     }
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
         let token_amount= amount * decimal_value ;
 
     if config.insurance_funds < amount
@@ -955,7 +972,7 @@ pub fn execute_insurance(
         {
             return Err(ContractError::Unauthorized {}); 
         }
-        let decimal_value=Uint128::new(1000000000);
+        let decimal_value=config.supply_limit;
         let token_amount= amount * decimal_value ;
     
         if config.staking_funds < amount
@@ -1008,9 +1025,9 @@ pub fn execute_insurance(
     {
         return Err(ContractError::PriceToken {}); 
     }
-
+    let mut config = TOKEN_INFO.load(deps.storage)?;
     let amount = coin.amount/price;
-    let decimal_value=Uint128::new(1000000000);
+    let decimal_value=config.supply_limit;
     let token_amount= decimal_value.multiply_ratio(coin.amount , price);
 
     if amount == Uint128::zero() {
@@ -1018,7 +1035,7 @@ pub fn execute_insurance(
         return Err(ContractError::InvalidZeroAmount {});
     }
 
-        let mut config = TOKEN_INFO.load(deps.storage)?;
+        
 
         if config.ido < amount
         {
@@ -1060,6 +1077,26 @@ pub fn execute_insurance(
             return Err(ContractError::Idoduration{}); 
         }
  }
+ 
+ pub fn execute_change_ownership(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    owner_address: Addr,
+)-> Result<Response, ContractError>
+{
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    if config.owner != info.sender 
+    {
+        return Err(ContractError::Unauthorized {}); 
+    } 
+    config.owner = owner_address;
+    TOKEN_INFO.save(deps.storage, &config)?;
+    let res = Response::new()
+    .add_attribute("action", "changeowner")
+    .add_attribute("owneraddress", config.owner);
+    Ok (res)
+}
         
 pub fn execute_mint(
     deps: DepsMut,
@@ -1302,6 +1339,8 @@ pub fn query_token_info(deps: Deps) -> StdResult<TokenInfoResponse> {
         team_next_month:info.team_next_month,
         ido_start_month:info.start_month,
         ido_end_month:info.ido_end_month,
+        supply_limit:info.supply_limit,
+        
 
     };
     Ok(res)
@@ -1350,7 +1389,7 @@ mod tests {
         query_balance(deps, address.into()).unwrap().balance
     }
 
-    // this will set up the instantiation for other tests
+    
     fn _do_instantiate(
         mut deps: DepsMut,
         addr: &str,
@@ -1361,6 +1400,7 @@ mod tests {
             name: "Proteus Token".to_string(),
             symbol: "PROTEUS".to_string(),
             decimals: 9,
+            supply_limit:Uint128::new (120000),
             initial_balances: vec![Cw20Coin {
                 address: addr.to_string(),
                 amount,
@@ -1413,6 +1453,7 @@ mod tests {
                 team_next_month:600,
                 ido_start_month:300,
                 ido_end_month:600,
+                supply_limit:Uint128::new(120000),
                 
             }
         );
@@ -1434,6 +1475,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1444,6 +1486,7 @@ mod tests {
             let _msg = ExecuteMsg::Seed {
         
                  recipient:addr1 ,
+                
             };
             
         }
@@ -1457,6 +1500,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1465,12 +1509,12 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Ido {
-
+           
                  recipient:addr1 ,
             };
             let _info = mock_info("creator", &[]);
             let _env = mock_env();
-            
+           
         }
         #[test]
         fn liquidity_work()
@@ -1482,6 +1526,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1490,7 +1535,6 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Liquidity {
-           
                  recipient:addr1 ,
                  amount:amount,
             };
@@ -1506,6 +1550,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1514,7 +1559,6 @@ mod tests {
                 marketing: None,
             };
             let _msg = ExecuteMsg::Advisor {
-           
                  recipient:addr1 ,
                  amount:amount,
             };
@@ -1531,6 +1575,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1555,6 +1600,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1583,6 +1629,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1610,6 +1657,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: "addr0000".into(),
                     amount,
@@ -1647,6 +1695,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![Cw20Coin {
                     address: String::from("addr0000"),
                     amount,
@@ -1678,6 +1727,7 @@ mod tests {
                     decimals: 9,
                     initial_balances: vec![],
                     mint: None,
+                    supply_limit:Uint128::new (120000),
                     marketing: Some(InstantiateMarketingInfo {
                         project: Some("Project".to_owned()),
                         description: Some("Description".to_owned()),
@@ -1718,6 +1768,7 @@ mod tests {
                     decimals: 9,
                     initial_balances: vec![],
                     mint: None,
+                    supply_limit:Uint128::new (120000),
                     marketing: Some(InstantiateMarketingInfo {
                         project: Some("Project".to_owned()),
                         description: Some("Description".to_owned()),
@@ -1745,6 +1796,7 @@ mod tests {
         let mut deps = mock_dependencies(&[]);
         let minter = String::from("asmodat");
         let _limit = Uint128::new(2000000000);
+
         // minter can mint coins to some winner
         let winner = String::from("lucky");
         let prize = Uint128::new(222_222_222);
@@ -1755,6 +1807,7 @@ mod tests {
 
         let _info = mock_info(minter.as_ref(), &[]);
         let _env = mock_env();
+
         // but cannot mint nothing
         let msg = ExecuteMsg::Mint {
             recipient: winner.clone(),
@@ -1764,11 +1817,13 @@ mod tests {
         let env = mock_env();
         let err = execute(deps.as_mut(), env, info, msg).unwrap_err();
         assert_eq!(err, ContractError::InvalidZeroAmount {});
+
     }
 
     #[test]
     fn others_cannot_mint() {
         let mut deps = mock_dependencies(&[]);
+
         let msg = ExecuteMsg::Mint {
             recipient: String::from("lucky"),
             amount: Uint128::new(222),
@@ -1776,7 +1831,7 @@ mod tests {
         let info = mock_info("anyone else", &[]);
         let env = mock_env();
         let _err = execute(deps.as_mut(), env, info, msg).unwrap_err();
-     
+    
     }
 
     #[test]
@@ -1803,6 +1858,7 @@ mod tests {
             name: "Proteus Token".to_string(),
             symbol: "PROTEUS".to_string(),
             decimals: 9,
+            supply_limit:Uint128::new (120000),
             initial_balances: vec![
                 Cw20Coin {
                     address: addr1.clone(),
@@ -1820,6 +1876,8 @@ mod tests {
         let env = mock_env();
         let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
         assert_eq!(0, res.messages.len());
+
+    
         assert_eq!(get_balance(deps.as_ref(), addr1), amount1);
         assert_eq!(get_balance(deps.as_ref(), addr2), amount2);
     }
@@ -1897,6 +1955,7 @@ mod tests {
         let _burn = Uint128::from(76543u128);
         let _too_much = Uint128::from(12340321u128);
 
+    
     }
 
     #[test]
@@ -1945,6 +2004,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -1999,6 +2059,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2052,6 +2113,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2105,6 +2167,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2158,6 +2221,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2211,6 +2275,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2264,6 +2329,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2321,6 +2387,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2372,6 +2439,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![],
                 mint: None,
                 marketing: Some(InstantiateMarketingInfo {
@@ -2421,6 +2489,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![],
                 mint: None,
                 marketing: Some(InstantiateMarketingInfo {
@@ -2473,6 +2542,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2523,6 +2593,7 @@ mod tests {
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
                 initial_balances: vec![],
+                supply_limit:Uint128::new (120000),
                 mint: None,
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
@@ -2574,6 +2645,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),
@@ -2629,6 +2701,7 @@ mod tests {
                 name: "Proteus Token".to_string(),
                 symbol: "PROTEUS".to_string(),
                 decimals: 9,
+                supply_limit:Uint128::new (120000),
                 initial_balances: vec![],
                 mint: None,
                 marketing: Some(InstantiateMarketingInfo {
@@ -2681,6 +2754,7 @@ mod tests {
                 decimals: 9,
                 initial_balances: vec![],
                 mint: None,
+                supply_limit:Uint128::new (120000),
                 marketing: Some(InstantiateMarketingInfo {
                     project: Some("Project".to_owned()),
                     description: Some("Description".to_owned()),

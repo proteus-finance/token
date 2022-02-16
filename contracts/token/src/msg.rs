@@ -21,6 +21,7 @@ pub struct InstantiateMsg {
     pub initial_balances: Vec<Cw20Coin>,
     pub mint: Option<MinterResponse>,
     pub marketing: Option<InstantiateMarketingInfo>,
+    pub supply_limit:Uint128,
 }
 
 impl InstantiateMsg {

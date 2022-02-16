@@ -71,7 +71,8 @@ mod tests {
         let instantiate_msg = InstantiateMsg {
             name: "Auto Gen".to_string(),
             symbol: "AUTO".to_string(),
-            decimals: 3,
+            supply_limit:Uint128::new (120000),
+            decimals: 9,
             initial_balances: vec![Cw20Coin {
                 address: addr.into(),
                 amount,

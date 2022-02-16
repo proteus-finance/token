@@ -44,6 +44,7 @@ pub struct TokenInfo {
     pub team_amount_monthly_remain:Uint128,
     pub ido_start_month:u64,
     pub ido_end_month:u64,
+    pub supply_limit:Uint128,
 
 }
 
