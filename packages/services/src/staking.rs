@@ -86,6 +86,7 @@ pub struct StakerLockedInfoResponse {
     pub tire:Uint128,
     pub month:u64,
     pub fee:Uint128,
+    pub lock_end:u64,
     
 }
 

@@ -37,6 +37,7 @@ pub struct StakerInfo {
    pub tire:Uint128,
    pub fee: Uint128,
 }
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct StakerLockedInfo {
     pub staker_address: String,
@@ -45,6 +46,7 @@ pub struct StakerLockedInfo {
     pub tire:Uint128,
     pub month:u64,
     pub fee: Uint128,
+    pub lock_end:u64,
  }
 
 //returns return staker_info of the given owner
@@ -97,6 +99,7 @@ pub fn read_staker_locked_info(storage: &dyn Storage, owner: &CanonicalAddr) -> 
             tire:Uint128::zero(),
             month:0,
             fee:Uint128::zero(),
+            lock_end:0,
         }),
     }
 }

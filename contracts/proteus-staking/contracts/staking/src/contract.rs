@@ -121,7 +121,7 @@ pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdR
     // let mut state: State = read_state(deps.storage)?;
         if amount == Uint128::zero()
         {
-            return Err(StdError::generic_err("Please enter correct amount"));
+            return Err(StdError::generic_err("amount is zero"));
         }
 
     
@@ -134,67 +134,62 @@ pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdR
      let tire_3_amount_1 = Uint128::new(100000);   //decimal_amount.multiply_ratio(Uint128::new(100000), decimal_amount);
      let tire_3_amount_2 =  Uint128::new(199999);      // decimal_amount.multiply_ratio(Uint128::new(199999), decimal_amount);
      let tire_4_amount =  Uint128::new(200000);                         //decimal_amount.multiply_ratio(Uint128::new(200000), decimal_amount);
-     let mut fee_staking=Uint128::zero();
+    
      let checked_amount = (amount + staker_info.stake_amount)/decimal_amount;
      if checked_amount < tire_0_amount
   {
       staker_info.tire =Uint128::zero();
-      //let amount = (staker_info.stake_amount * Decimal::from(0.5 as f64))/Uint128::new (100);
-      let res = staker_info.stake_amount * Decimal::from_ratio(7u128,10u128);
-    let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-    fee_staking = fee * Uint128::from(1 as u128);    
+      let res = amount.multiply_ratio(7u128,10u128);
+     let fee = Decimal::from_ratio(res , 100 as u128);
+     let staking_fee = fee * Uint128::from(1 as u128);    
+     staker_info.stake_amount += amount - staking_fee;
+     staker_info.fee=staking_fee;
 
   }
 
   if  checked_amount >= tire_0_amount && checked_amount < tire_1_amount
   {
     staker_info.tire =Uint128::new(1);
-    let res = staker_info.stake_amount * Decimal::from_ratio(7u128,10u128);
-    let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-    fee_staking = fee * Uint128::from(1 as u128);
+    let res = amount.multiply_ratio(7u128,10u128);
+   let fee = Decimal::from_ratio(res , 100 as u128);
+   let staking_fee = fee * Uint128::from(1 as u128);    
+   staker_info.stake_amount += amount - staking_fee;
+   staker_info.fee=staking_fee;
   }
 
   if checked_amount >= tire_1_amount && checked_amount <= tire_2_amount
   {
     staker_info.tire =Uint128::new(2);
-    let res = staker_info.stake_amount * Decimal::from_ratio(5u128,10u128);
-    let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-    fee_staking = fee * Uint128::from(1 as u128);
+    let res = amount.multiply_ratio(5u128,10u128);
+   let fee = Decimal::from_ratio(res , 100 as u128);
+   let staking_fee = fee * Uint128::from(1 as u128);    
+   staker_info.stake_amount += amount - staking_fee;
+   staker_info.fee=staking_fee;
   }
 
  if checked_amount >= tire_3_amount_1 && checked_amount <= tire_3_amount_2
   {
     staker_info.tire =Uint128::new(3);  
-    let res = staker_info.stake_amount * Decimal::from_ratio(3u128,10u128);
-    let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-    fee_staking = fee * Uint128::from(1 as u128);
+    let res = amount.multiply_ratio(3u128,10u128);
+    let fee = Decimal::from_ratio(res , 100 as u128);
+    let staking_fee = fee * Uint128::from(1 as u128);    
+    staker_info.stake_amount += amount - staking_fee;
+    staker_info.fee=staking_fee;
   }
 
   if checked_amount >= tire_4_amount
   {
     staker_info.tire =Uint128::new(4);
-    let res = staker_info.stake_amount * Decimal::from_ratio(0u128,10u128);
-    let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-    fee_staking = fee * Uint128::from(1 as u128);
+    let res = amount.multiply_ratio(0u128,10u128);
+   let fee = Decimal::from_ratio(res , 100 as u128);
+   let staking_fee = fee * Uint128::from(1 as u128);    
+   staker_info.stake_amount += amount - staking_fee;
+   staker_info.fee=staking_fee;
   } 
 
-  staker_info.stake_amount += checked_amount - fee_staking ;
-  staker_info.start_time += current_time;
-  staker_info.fee += fee_staking;
-
-//   else if amount =<
-     
-
-    // // Compute global reward & staker reward
-    // compute_reward(&config, &mut state, current_time);
-    // compute_staker_reward(&state, &mut staker_info)?;
-
-    // // Increase bond_amount
-   // increase_bond_amount(&mut state, &mut staker_info, amount);
-     
-
-      
-
+  
+  staker_info.start_time = current_time;
+ // staker_info.fee += fee_staking;
     // Store updated state with staker's staker_info
      store_staker_info(deps.storage, &sender_addr_raw, &staker_info)?;
     // store_state(deps.storage, &state)?;
@@ -235,50 +230,59 @@ pub fn locked(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128,month:
     let checked_amount = (amount + staker_info.stake_amount)/decimal_amount;
     if checked_amount < tire_0_amount
     {
-        staker_info.tire =Uint128::zero();
-        //let amount = (staker_info.stake_amount * Decimal::from(0.5 as f64))/Uint128::new (100);
-        let res = staker_info.stake_amount * Decimal::from_ratio(7u128,10u128);
-      let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-      fee_staking = fee * Uint128::from(1 as u128);    
+        staker_info.tire =Uint128::new(1);
+        let res = amount.multiply_ratio(7u128,10u128);
+       let fee = Decimal::from_ratio(res , 100 as u128);
+       let staking_fee = fee * Uint128::from(1 as u128);    
+       staker_info.stake_amount += amount - staking_fee;
+       staker_info.fee=staking_fee;
   
     }
   
     if  checked_amount >= tire_0_amount && checked_amount < tire_1_amount
     {
       staker_info.tire =Uint128::new(1);
-      let res = staker_info.stake_amount * Decimal::from_ratio(7u128,10u128);
-      let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-      fee_staking = fee * Uint128::from(1 as u128);
+      let res = amount.multiply_ratio(7u128,10u128);
+     let fee = Decimal::from_ratio(res , 100 as u128);
+     let staking_fee = fee * Uint128::from(1 as u128);    
+     staker_info.stake_amount += amount - staking_fee;
+     staker_info.fee=staking_fee;
     }
   
     if checked_amount >= tire_1_amount && checked_amount <= tire_2_amount
     {
       staker_info.tire =Uint128::new(2);
-      let res = staker_info.stake_amount * Decimal::from_ratio(5u128,10u128);
-      let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-      fee_staking = fee * Uint128::from(1 as u128);
+      let res = amount.multiply_ratio(5u128,10u128);
+     let fee = Decimal::from_ratio(res , 100 as u128);
+     let staking_fee = fee * Uint128::from(1 as u128);    
+     staker_info.stake_amount += amount - staking_fee;
+     staker_info.fee=staking_fee;
     }
   
    if checked_amount >= tire_3_amount_1 && checked_amount <= tire_3_amount_2
     {
       staker_info.tire =Uint128::new(3);  
-      let res = staker_info.stake_amount * Decimal::from_ratio(3u128,10u128);
-      let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-      fee_staking = fee * Uint128::from(1 as u128);
+      let res = amount.multiply_ratio(3u128,10u128);
+      let fee = Decimal::from_ratio(res , 100 as u128);
+      let staking_fee = fee * Uint128::from(1 as u128);    
+      staker_info.stake_amount += amount - staking_fee;
+      staker_info.fee=staking_fee;
     }
   
     if checked_amount >= tire_4_amount
     {
       staker_info.tire =Uint128::new(4);
-      let res = staker_info.stake_amount * Decimal::from_ratio(0u128,10u128);
-      let fee = Decimal::from_ratio(res *  Uint128::new (1000000000)  , 100 as u128);
-      fee_staking = fee * Uint128::from(1 as u128);
+      let res = amount.multiply_ratio(0u128,10u128);
+     let fee = Decimal::from_ratio(res , 100 as u128);
+     let staking_fee = fee * Uint128::from(1 as u128);    
+     staker_info.stake_amount += amount - staking_fee;
+     staker_info.fee=staking_fee;
     } 
-
-    staker_info.stake_amount += checked_amount - fee_staking ;
-    staker_info.start_time += current_time;
-    staker_info.fee += fee_staking;
-    staker_info.month +=month;
+  
+    
+    staker_info.start_time = current_time;
+    staker_info.lock_end = current_time +400;
+    staker_info.month = month;
 
 
    // Store updated state with staker's staker_info
@@ -312,7 +316,7 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
    
     if staker_info.tire == Uint128::zero()
     {  
-      amount = decimal_value.multiply_ratio(staker_info.stake_amount,Uint128::new(1));
+      amount = staker_info.stake_amount;
     //  amount =Decimal:: multiply_ratio(staker_info.stake_amount,1000);
     }
 
@@ -321,36 +325,33 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
      
     // let percentage_per_sec= 10/(60*60*24*365);
      let total_profit_percentage= Decimal::from_ratio (10 * timeinvest as u128 ,60*60*24*365 as u128);
-     let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-     let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-     amount = (total_value + amount1) * Uint128::from(1 as u128);
+     let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+     amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
     }
 
     if staker_info.tire == Uint128::new(2)
     {
         //let percentage_per_sec= 12/(60*60*24*365);
         let total_profit_percentage= Decimal::from_ratio (12 * timeinvest as u128, 60*60*24*365 as  u128);
-        let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-        let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-        amount = (total_value + amount1) * Uint128::from(1 as u128);
+        let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+        amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
     }
 
     if staker_info.tire == Uint128::new(3)
     {
         //let percentage_per_sec= 14/(60*60*24*365);
         let total_profit_percentage= Decimal::from_ratio (14 * timeinvest as u128 , 60*60*24*365 as  u128);
-        let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-        let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-        amount = (total_value + amount1) * Uint128::from(1 as u128);
+        let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+    
+        amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
     }
 
     if staker_info.tire == Uint128::new(4)
     {
        // let percentage_per_sec= 18/(60*60*24*365);
         let total_profit_percentage= Decimal::from_ratio (18 * timeinvest as u128 , 60*60*24*365 as  u128);
-        let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-        let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-        amount = (total_value + amount1) * Uint128::from(1 as u128);
+        let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+        amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
     }
 
     staker_info.stake_amount=Uint128::zero();
@@ -384,84 +385,77 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
      let mut  amount=Uint128::zero();
     let config: Config = read_config(deps.storage)?;
     //let mut state: State = read_state(deps.storage)?;
+    
     let mut staker_info = read_staker_locked_info(deps.storage, &sender_addr_raw)?;
     let timeinvest = current_time - staker_info.start_time;
+
    let decimal_value=Uint128::new (1000000000);
-    let calculatetime = staker_info.month * (60*60*24*30 as u64);
      
-    if calculatetime > current_time
+    if staker_info.start_time > staker_info.lock_end
     {
         return Err(StdError::generic_err("your locked time not end yet"));
     }
    
     if staker_info.tire == Uint128::zero()
     {  
-      amount = decimal_value.multiply_ratio(staker_info.stake_amount,Uint128::new(1));
+      amount = staker_info.stake_amount;
     //  amount =Decimal:: multiply_ratio(staker_info.stake_amount,1000);
     }
-
+   
     if staker_info.tire == Uint128::new(1)
     {
         if staker_info.month == 1
         {
             let total_profit_percentage= Decimal::from_ratio (10 * timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 3
         {
             let total_profit_percentage= Decimal::from_ratio (11* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 6
         {
             let total_profit_percentage= Decimal::from_ratio (12* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 12
         {
             let total_profit_percentage= Decimal::from_ratio (13* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 24
         {
             let total_profit_percentage= Decimal::from_ratio (14* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 36
         {
             let total_profit_percentage= Decimal::from_ratio (15* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 60
         {
             let total_profit_percentage= Decimal::from_ratio (16* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 120
         {
             let total_profit_percentage= Decimal::from_ratio (17* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
      
     // let percentage_per_sec= 10/(60*60*24*365);
@@ -473,63 +467,55 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
         if staker_info.month == 1
         {
             let total_profit_percentage= Decimal::from_ratio (12 * timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 3
         {
             let total_profit_percentage= Decimal::from_ratio (13* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 6
         {
             let total_profit_percentage= Decimal::from_ratio (14* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 12
         {
             let total_profit_percentage= Decimal::from_ratio (15* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 24
         {
             let total_profit_percentage= Decimal::from_ratio (16* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 36
         {
             let total_profit_percentage= Decimal::from_ratio (17* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 60
         {
             let total_profit_percentage= Decimal::from_ratio (18* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 120
         {
             let total_profit_percentage= Decimal::from_ratio (19* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
      
     }
@@ -539,63 +525,55 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
         if staker_info.month == 1
         {
             let total_profit_percentage= Decimal::from_ratio (14 * timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 3
         {
             let total_profit_percentage= Decimal::from_ratio (15* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 6
         {
             let total_profit_percentage= Decimal::from_ratio (16* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 12
         {
             let total_profit_percentage= Decimal::from_ratio (18* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 24
         {
             let total_profit_percentage= Decimal::from_ratio (20* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 36
         {
             let total_profit_percentage= Decimal::from_ratio (21* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 60
         {
             let total_profit_percentage= Decimal::from_ratio (22* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 120
         {
             let total_profit_percentage= Decimal::from_ratio (25* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
     }
 
@@ -604,63 +582,55 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
         if staker_info.month == 1
         {
             let total_profit_percentage= Decimal::from_ratio (18 * timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 3
         {
             let total_profit_percentage= Decimal::from_ratio (20* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
         if staker_info.month == 6
         {
             let total_profit_percentage= Decimal::from_ratio (22* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 12
         {
             let total_profit_percentage= Decimal::from_ratio (24* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 24
         {
             let total_profit_percentage= Decimal::from_ratio (26* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 36
         {
             let total_profit_percentage= Decimal::from_ratio (28* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 60
         {
             let total_profit_percentage= Decimal::from_ratio (30* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
 
         if staker_info.month == 120
         {
             let total_profit_percentage= Decimal::from_ratio (50* timeinvest as u128 ,60*60*24*365 as u128);
-            let total_value=Decimal::from_ratio (total_profit_percentage  *(staker_info.stake_amount*decimal_value),Uint128::new(100));
-            let amount1 = Decimal::from_ratio (staker_info.stake_amount *decimal_value ,Uint128::new(1) );
-           amount = (total_value + amount1) * Uint128::from(1 as u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
     }
 
@@ -696,7 +666,7 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
             funds: vec![],
         })
         .add_attributes(vec![
-            ("action", "withdraw"),
+            ("action", "withdraw_locked"),
             ("owner", &info.sender.to_string()),
             ("amount", &amount.to_string()),
         ]))
@@ -792,6 +762,7 @@ pub fn query_staker_locked_info(
         tire:staker_info.tire,
         month:staker_info.month,
         fee:staker_info.fee,
+        lock_end:staker_info.lock_end,
        // pending_reward: staker_info.pending_reward,
     })
 }
