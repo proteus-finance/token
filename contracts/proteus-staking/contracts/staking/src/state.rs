@@ -36,6 +36,7 @@ pub struct StakerInfo {
    pub start_time:u64,
    pub tire:Uint128,
    pub fee: Uint128,
+   pub bonus:Uint128,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -85,6 +86,7 @@ pub fn read_staker_info(storage: &dyn Storage, owner: &CanonicalAddr) -> StdResu
             start_time:0,
             tire:Uint128::zero(),
             fee:Uint128::zero(),
+            bonus:Uint128::zero(),
         }),
     }
 }

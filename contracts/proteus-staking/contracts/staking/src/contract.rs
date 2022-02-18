@@ -64,7 +64,7 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
         ExecuteMsg::Receive(msg) => receive_cw20(deps, env, info, msg),
       
        // ExecuteMsg::Unbond { amount } => unbond(deps, env, info, amount),
-        ExecuteMsg::Withdraw {} => withdraw(deps, env, info),
+        ExecuteMsg::Withdraw {amount_withdraw} => withdraw(deps, env, info,amount_withdraw),
 
         ExecuteMsg:: WithdrawLocked {} => withdraw_locked(deps, env, info),
 
@@ -116,6 +116,7 @@ pub fn receive_cw20(
 pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdResult<Response> {
      let current_time = get_time(&env.block);
      let sender_addr_raw: CanonicalAddr = deps.api.addr_canonicalize(sender_addr.as_str())?;
+     let mut bonus = Uint128::zero();
 
     // let config: Config = read_config(deps.storage)?;
     // let mut state: State = read_state(deps.storage)?;
@@ -126,6 +127,53 @@ pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdR
 
     
      let mut staker_info: StakerInfo = read_staker_info(deps.storage, &sender_addr_raw)?;
+      if staker_info.stake_amount >  Uint128::zero()
+      {
+        let timeinvest = current_time - staker_info.start_time;
+
+        if staker_info.tire == Uint128::zero()
+        {  
+            bonus = staker_info.stake_amount;
+        //  amount =Decimal:: multiply_ratio(staker_info.stake_amount,1000);
+        }
+    
+        if staker_info.tire == Uint128::new(1)
+        {
+         
+        // let percentage_per_sec= 10/(60*60*24*365);
+         let total_profit_percentage = Decimal::from_ratio (10 * timeinvest as u128 ,60*60*24*365 as u128);
+         let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+         bonus = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+        }
+    
+        if staker_info.tire == Uint128::new(2)
+        {
+            //let percentage_per_sec= 12/(60*60*24*365);
+            let total_profit_percentage= Decimal::from_ratio (12 * timeinvest as u128, 60*60*24*365 as  u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            bonus = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+        }
+    
+        if staker_info.tire == Uint128::new(3)
+        {
+            //let percentage_per_sec= 14/(60*60*24*365);
+            let total_profit_percentage= Decimal::from_ratio (14 * timeinvest as u128 , 60*60*24*365 as  u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+        
+            bonus = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+        }
+    
+        if staker_info.tire == Uint128::new(4)
+        {
+           // let percentage_per_sec= 18/(60*60*24*365);
+            let total_profit_percentage= Decimal::from_ratio (18 * timeinvest as u128 , 60*60*24*365 as  u128);
+            let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+            bonus = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+        }
+
+      }
+
+
      let decimal_amount=Uint128::new(1000000000);
      
      let tire_0_amount = Uint128::new(20000);  //decimal_amount.multiply_ratio(Uint128::new(200), decimal_amount);;
@@ -135,7 +183,7 @@ pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdR
      let tire_3_amount_2 =  Uint128::new(199999);      // decimal_amount.multiply_ratio(Uint128::new(199999), decimal_amount);
      let tire_4_amount =  Uint128::new(200000);                         //decimal_amount.multiply_ratio(Uint128::new(200000), decimal_amount);
     
-     let checked_amount = (amount + staker_info.stake_amount)/decimal_amount;
+     let checked_amount = (amount + bonus)/decimal_amount;
      if checked_amount < tire_0_amount
   {
       staker_info.tire =Uint128::zero();
@@ -304,7 +352,7 @@ fn get_time(block: &BlockInfo) -> u64 {
 }
 
 // withdraw rewards to executor
-pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
+pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo,amount_withdraw: Uint128) -> StdResult<Response> {
     let current_time = get_time(&env.block);
     let sender_addr_raw = deps.api.addr_canonicalize(info.sender.as_str())?;
      let mut  amount=Uint128::zero();
@@ -316,7 +364,7 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
    
     if staker_info.tire == Uint128::zero()
     {  
-      amount = staker_info.stake_amount;
+      amount = staker_info.stake_amount - amount_withdraw;
     //  amount =Decimal:: multiply_ratio(staker_info.stake_amount,1000);
     }
 
@@ -324,9 +372,9 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
     {
      
     // let percentage_per_sec= 10/(60*60*24*365);
-     let total_profit_percentage= Decimal::from_ratio (10 * timeinvest as u128 ,60*60*24*365 as u128);
+     let total_profit_percentage = Decimal::from_ratio (10 * timeinvest as u128 ,60*60*24*365 as u128);
      let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
-     amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+     amount = (staker_info.stake_amount + (total_value  * Uint128::from(1 as u128)))-amount_withdraw;
     }
 
     if staker_info.tire == Uint128::new(2)
@@ -334,8 +382,7 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
         //let percentage_per_sec= 12/(60*60*24*365);
         let total_profit_percentage= Decimal::from_ratio (12 * timeinvest as u128, 60*60*24*365 as  u128);
         let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
-        amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
-    }
+        amount = (staker_info.stake_amount + (total_value  * Uint128::from(1 as u128)))-amount_withdraw;    }
 
     if staker_info.tire == Uint128::new(3)
     {
@@ -343,7 +390,7 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
         let total_profit_percentage= Decimal::from_ratio (14 * timeinvest as u128 , 60*60*24*365 as  u128);
         let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
     
-        amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+        amount = (staker_info.stake_amount + (total_value  * Uint128::from(1 as u128)))-amount_withdraw;
     }
 
     if staker_info.tire == Uint128::new(4)
@@ -351,13 +398,25 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
        // let percentage_per_sec= 18/(60*60*24*365);
         let total_profit_percentage= Decimal::from_ratio (18 * timeinvest as u128 , 60*60*24*365 as  u128);
         let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
-        amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
+        amount = (staker_info.stake_amount + (total_value  * Uint128::from(1 as u128)))-amount_withdraw;
     }
 
+
+    if amount > Uint128::zero()
+    {
+
+        staker_info.stake_amount=amount;
+        staker_info.start_time=current_time;
+    }
+    else{
+
+    
     staker_info.stake_amount=Uint128::zero();
     staker_info.start_time=0;
     staker_info.tire=Uint128::zero();
     staker_info.fee=Uint128::zero();
+
+    }
     
    
   store_staker_info(deps.storage, &sender_addr_raw, &staker_info)?;
@@ -367,19 +426,19 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Respons
             contract_addr: deps.api.addr_humanize(&config.staking_token)?.to_string(),
             msg: to_binary(&Cw20ExecuteMsg::Transfer {
                 recipient: info.sender.to_string(),
-                amount,
+                amount:amount_withdraw,
             })?,
             funds: vec![],
         })
         .add_attributes(vec![
             ("action", "withdraw"),
             ("owner", &info.sender.to_string()),
-            ("amount", &amount.to_string()),
+            ("amount", &amount_withdraw.to_string()),
         ]))
 }
 
 
-pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
+pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo,) -> StdResult<Response> {
     let current_time = get_time(&env.block);
     let sender_addr_raw = deps.api.addr_canonicalize(info.sender.as_str())?;
      let mut  amount=Uint128::zero();
@@ -391,7 +450,7 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
 
    let decimal_value=Uint128::new (1000000000);
      
-    if staker_info.start_time > staker_info.lock_end
+    if current_time > staker_info.lock_end
     {
         return Err(StdError::generic_err("your locked time not end yet"));
     }
@@ -638,6 +697,9 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo) -> StdResult
     staker_info.start_time=0;
     staker_info.tire=Uint128::zero();
     staker_info.fee=Uint128::zero();
+    staker_info.month=0;
+    staker_info.lock_end=0;
+
     
     // Compute global reward & staker reward
     //compute_reward(&config, &mut state, current_time);
@@ -707,7 +769,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::StakerInfo {
             staker_address,
 
-        } => to_binary(&query_staker_info(deps, staker_address)?),
+        } => to_binary(&query_staker_info(deps,_env, staker_address)?),
 
         QueryMsg::StakerLockedInfo {
             staker_address,
@@ -731,11 +793,55 @@ pub fn query_config(deps: Deps) -> StdResult<ConfigResponse> {
 
 pub fn query_staker_info(
     deps: Deps,
+    env: Env,
     staker: String,
 ) -> StdResult<StakerInfoResponse> {
+    let current_time = get_time(&env.block);
     let staker_raw = deps.api.addr_canonicalize(&staker)?;
 
     let mut staker_info: StakerInfo = read_staker_info(deps.storage, &staker_raw)?;
+    let timeinvest = current_time - staker_info.start_time;
+    let mut  bonus = Uint128::zero();
+
+    if staker_info.tire == Uint128::zero()
+    {  
+        bonus = staker_info.stake_amount;
+    //  amount =Decimal:: multiply_ratio(staker_info.stake_amount,1000);
+    }
+
+    if staker_info.tire == Uint128::new(1)
+    {
+     
+    // let percentage_per_sec= 10/(60*60*24*365);
+     let total_profit_percentage = Decimal::from_ratio (10 * timeinvest as u128 ,60*60*24*365 as u128);
+     let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+     bonus = total_value  * Uint128::from(1 as u128));
+    }
+
+    if staker_info.tire == Uint128::new(2)
+    {
+        //let percentage_per_sec= 12/(60*60*24*365);
+        let total_profit_percentage= Decimal::from_ratio (12 * timeinvest as u128, 60*60*24*365 as  u128);
+        let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+        bonus = total_value  * Uint128::from(1 as u128));
+    }
+
+    if staker_info.tire == Uint128::new(3)
+    {
+        //let percentage_per_sec= 14/(60*60*24*365);
+        let total_profit_percentage= Decimal::from_ratio (14 * timeinvest as u128 , 60*60*24*365 as  u128);
+        let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+    
+        bonus = total_value  * Uint128::from(1 as u128));
+    }
+
+    if staker_info.tire == Uint128::new(4)
+    {
+       // let percentage_per_sec= 18/(60*60*24*365);
+        let total_profit_percentage= Decimal::from_ratio (18 * timeinvest as u128 , 60*60*24*365 as  u128);
+        let total_value=Decimal::from_ratio (total_profit_percentage  *staker_info.stake_amount,Uint128::new(100));
+        bonus = total_value  * Uint128::from(1 as u128));
+    }
   
     Ok(StakerInfoResponse {
         staker_address:staker,
@@ -743,6 +849,7 @@ pub fn query_staker_info(
         start_time: staker_info.start_time,
         tire:staker_info.tire,
         fee:staker_info.fee,
+        bonus:bonus,
        // pending_reward: staker_info.pending_reward,
     })
 }
