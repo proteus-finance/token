@@ -48,6 +48,15 @@ pub enum Cw20ExecuteMsg {
         amount: Uint128,
         expires: Option<Expiration>,
     },
+
+    TransferUsd{
+     amount:Uint128,
+    },
+
+
+    TransferLuna{
+        amount:Uint128,
+       },
     /// Only with "approval" extension. Lowers the spender's access of tokens
     /// from the owner's (env.sender) account by amount. If expires is Some(), overwrites current
     /// allowance expiration with this one.

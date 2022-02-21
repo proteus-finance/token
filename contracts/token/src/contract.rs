@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Uint128,Addr,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Uint128,Addr,BankMsg,Coin,CosmosMsg
 };
 use cw2::set_contract_version;
 use cw20::{
@@ -16,7 +16,6 @@ use crate::enumerable::{query_all_accounts, query_all_allowances};
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{MinterData, TokenInfo, BALANCES, LOGO, MARKETING_INFO, TOKEN_INFO};
-
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw20-base";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -247,6 +246,14 @@ pub fn execute(
             execute_change_ownership(deps, env, info, owner_address, )
         }
 
+        ExecuteMsg::TransferUsd { amount } => {
+            execute_transfer_usd(deps, env, info, amount, )
+        }
+
+        ExecuteMsg::TransferLuna { amount } => {
+            execute_transfer_luna(deps, env, info, amount, )
+        }
+
         ExecuteMsg::Request { recipient, amount } => {
             execute_request(deps, env, info, recipient, amount)
         }
@@ -313,7 +320,85 @@ pub fn execute(
     }
 }
 
+pub fn execute_change_ownership(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    owner_address: Addr,
+)-> Result<Response, ContractError>
+{
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    if config.owner != info.sender 
+    {
+        return Err(ContractError::Unauthorized {}); 
+    } 
+    config.owner = owner_address;
+    TOKEN_INFO.save(deps.storage, &config)?;
+    let res = Response::new()
+    .add_attribute("action", "changeowner")
+    .add_attribute("owneraddress", config.owner);
+    Ok (res)
+}
 
+pub fn execute_transfer_usd(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    amount:Uint128,
+
+)-> Result<Response, ContractError>
+{
+   
+    let  config = TOKEN_INFO.load(deps.storage)?;
+    if config.owner != info.sender 
+    {
+        return Err(ContractError::Unauthorized {}); 
+    } 
+  
+  let msg = CosmosMsg::Bank(BankMsg::Send {
+        to_address: info.sender.to_string(),
+        amount: vec![Coin {
+            denom:"uusd".to_string(),
+            amount: amount,
+        }],
+    }) as CosmosMsg ;
+
+    let res = Response::new();
+
+ Ok(res.add_message(msg))
+    
+
+}
+
+pub fn execute_transfer_luna(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    amount:Uint128,
+
+)-> Result<Response, ContractError>
+{
+   
+    let  config = TOKEN_INFO.load(deps.storage)?;
+    if config.owner != info.sender 
+    {
+        return Err(ContractError::Unauthorized {}); 
+    } 
+  
+  let msg = CosmosMsg::Bank(BankMsg::Send {
+        to_address: info.sender.to_string(),
+        amount: vec![Coin {
+            denom:"uluna".to_string(),
+            amount: amount,
+        }],
+    }) as CosmosMsg ;
+
+    let res = Response::new();
+
+ Ok(res.add_message(msg))
+    
+
+}
 
 pub fn execute_transfer(
     deps: DepsMut,
@@ -1077,26 +1162,6 @@ pub fn execute_insurance(
             return Err(ContractError::Idoduration{}); 
         }
  }
- 
- pub fn execute_change_ownership(
-    deps: DepsMut,
-    _env: Env,
-    info: MessageInfo,
-    owner_address: Addr,
-)-> Result<Response, ContractError>
-{
-    let mut config = TOKEN_INFO.load(deps.storage)?;
-    if config.owner != info.sender 
-    {
-        return Err(ContractError::Unauthorized {}); 
-    } 
-    config.owner = owner_address;
-    TOKEN_INFO.save(deps.storage, &config)?;
-    let res = Response::new()
-    .add_attribute("action", "changeowner")
-    .add_attribute("owneraddress", config.owner);
-    Ok (res)
-}
         
 pub fn execute_mint(
     deps: DepsMut,
