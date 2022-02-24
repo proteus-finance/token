@@ -1,3 +1,13 @@
+/*  
+  this is staking smart contract in which owner of proteus token will 
+  stake in which we dealing two types of staking one is locked staking 
+  in which user wil stake for specific time if specific time not complete 
+  then he cant withdraw but in unlocked staking stker can withdraw his amount 
+  any time and he cen stake amount many time. so infomation of locked staking and 
+  unlocked staking manged seprately
+*/
+// in start we impoart some rust pkg thats will support our smart contract
+
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 
@@ -28,6 +38,24 @@ use crate::state::{
 
 use cw20::{Cw20ExecuteMsg, Cw20ReceiveMsg};
 
+/*
+   when we deploy our smart contract then initate function will execute 
+   so in start his function we pass one address of our token so in start 
+   our token address will be set.
+
+
+                      "Instantiate Json"
+
+                      {
+                       
+                        "staking_token":"terra14u5n457t9lyh3qpzdkjxjhwh0dlcm90whgzzzn"
+
+                      }
+
+
+
+*/
+
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
@@ -47,6 +75,14 @@ pub fn instantiate(
 
     Ok(Response::default())
 }
+  
+
+/*
+basically this execute function help to execute the function 
+when we execute any function then we pay the gass fee those 
+function we need to execute we define these function inside execute
+function */
+
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> StdResult<Response> {
@@ -71,6 +107,11 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
     }
 }
 
+/*    this is recieve cw 20 function thats purpose to recive
+      cw 20  but this function also will tigger other two function
+      one is bond thats will use for unlock staking and other locked
+      thats purpose is unlocked staking 
+*/
 
 pub fn receive_cw20(
     deps: DepsMut,
@@ -103,6 +144,27 @@ pub fn receive_cw20(
         Err(_) => Err(StdError::generic_err("data should be given")),
     }
 }
+/*
+    this bond function is used for normal staking  
+    and tkae two parameter one is address and second one is amount 
+    but we executing this recive cw20 so its will take base 64.
+
+                          "bond function json"
+
+
+
+                                  {
+
+                                "send": {
+                                "msg": "eyJib25kIjp7fX0=",
+                               "amount": "15000000000",
+                                "contract": "terra10mdmmerj556fcm57xy45a6ga3rm0wu9mcnzlak"
+                                 }
+                              }
+
+
+*/
+
 
 pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdResult<Response> {
      let current_time = get_time(&env.block);
@@ -237,7 +299,26 @@ pub fn bond(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128) -> StdR
 }
 
 
+/*
+  locked funtion used for lock staking 
+  this function will take three parameters 
+  address, amount and month thesen months start 
+  from 1 to 120 so thats time you set you cant withdraw 
+  before this
+            "locked json "
 
+
+                {
+
+              "send": {
+               "msg": "eyJsb2NrZWQiOnsibW9udGgiOjF9fQ==",
+               "amount": "1500000000",
+               "contract": "terra13dycyqjf8kv0xqqlh2wm5lq98w3lzkptgrt9mj"
+               }
+
+              }
+
+*/
 
 pub fn locked(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128,month:u64) -> StdResult<Response> {
     let current_time = get_time(&env.block);
@@ -335,7 +416,22 @@ pub fn locked(deps: DepsMut, env: Env, sender_addr: Addr, amount: Uint128,month:
 
 
 
+/*
+this function is used to withdraw unlocked staking amount and get 
+bonus according to the tire this withdraw function take 
+one paramenter thats is amount_withdraw
 
+            "withdraw unlocked json"
+
+            {
+                "withdraw":{
+                    "amount_withdraw":"1000000"
+                }
+            }
+
+
+
+*/
 
 // withdraw rewards to executor
 pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo,amount_withdraw: Uint128) -> StdResult<Response> {
@@ -424,6 +520,23 @@ pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo,amount_withdraw: Uint
             ("amount", &amount_withdraw.to_string()),
         ]))
 }
+
+
+/*
+this withdraw locked function used to withdraw 
+locked amount if duration paeriod complete and amount is unlocke 
+this function not take any parameter just withdraw your amount
+ 
+                     "withdraw_locked json"
+
+                     {
+                         "withdraw_locked":{}
+                     }
+                
+                     
+
+*/
+
 
 
 pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo,) -> StdResult<Response> {
@@ -707,6 +820,22 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo,) -> StdResul
         ]))
 }
 
+/*  
+     withdraw_owner this function used  to withdraw token in staking sunction
+     only owner can execute this function this function only take one parameter
+     that is amount.
+
+          "withdraw_owner json"
+
+          {
+              "withdraw_owner":{
+                  "amount":1000000
+              }
+          }
+
+     */
+
+
 pub fn withdraw_owner(deps: DepsMut, env: Env, info: MessageInfo, amount: Uint128) -> StdResult<Response>
 {
     let config: Config = read_config(deps.storage)?;
@@ -736,6 +865,24 @@ pub fn withdraw_owner(deps: DepsMut, env: Env, info: MessageInfo, amount: Uint12
 fn get_time(block: &BlockInfo) -> u64 {
     block.time.seconds()
 }
+
+
+/* execute_transfer_usd is custom function of token 
+   in which only owner can witdraw usd from smart contract. owner
+   need to pass amount in six decimal how much want to withdraw
+
+                   "execute transfer usd json"
+
+
+                    {
+                     "transfer_usd":{
+                         "amount":"1000000"
+                     }
+                        
+                    }
+   
+   */
+
 
 
 pub fn execute_transfer_usd(
@@ -768,6 +915,27 @@ pub fn execute_transfer_usd(
 
 }
 
+
+/* execute_transfer_luna is custom function of token 
+   in which only owner can witdraw  luna  from smart contract. owner
+   need to pass amount in six decimal how much want to withdraw
+
+                    "execute transfer luna json"
+
+
+                     {
+                     "transfer_luna":{
+                         "amount":"1000000"
+                     }
+                        
+                    }
+   
+   
+   */
+
+
+
+
 pub fn execute_transfer_luna(
     deps: DepsMut,
     _env: Env,
@@ -797,7 +965,40 @@ pub fn execute_transfer_luna(
     
 }
 
+ /*
+   "config query info json"
+   {
+       "staking_info":{}
+   }
 
+   */
+
+
+   /*
+         "staker info json "
+
+         {
+             "staker_info":{
+                 "staker_address":"0x17"
+             }
+         }
+
+   */
+
+
+
+      /*
+         "staker locked_info json query "
+
+         {
+             "staker_locked_info":{
+                 "staker_address":"0x17"
+             }
+         }
+
+   */
+
+   
 
 
 #[cfg_attr(not(feature = "library"), entry_point)]
