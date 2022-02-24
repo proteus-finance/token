@@ -1,3 +1,7 @@
+/* this is Cw20 proteous token. there we will be disscuss all the standard 
+   and custom function of token and briefly will explain one by one 
+*/
+// first in token we import different pkg
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
@@ -83,6 +87,36 @@ fn verify_logo(logo: &Logo) -> Result<(), ContractError> {
         Logo::Url(_) => Ok(()), // Any reasonable url validation would be regex based, probably not worth it
     }
 }
+
+//when we deploy then instantiate function execute and we set different percentages for tokennomics
+
+
+/*   
+          jSon for initate Msg
+    
+{
+  "name": "Proteus Token",
+  "symbol": "PROTEUS",
+  "decimals": 6,
+  "supply_limit": "1000000",
+  "marketing": {
+    "marketing": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+  },
+  "minter": {
+    "minter": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc",
+    "cap": "1000000"
+  },
+  "initial_balances": [
+    {
+      "amount": "0",
+      "address": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+  ]
+}
+
+
+
+*/
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -231,6 +265,10 @@ pub fn create_accounts(deps: &mut DepsMut, accounts: &[Cw20Coin]) -> StdResult<U
     Ok(total_supply)
 }
 
+/* function execute basically help to execute other function and we define 
+there those function thats we need to excute and our all function define there */
+
+
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
     deps: DepsMut,
@@ -320,6 +358,25 @@ pub fn execute(
     }
 }
 
+/* execute_change_ownership function is custom function 
+   of token in which owner will pass the new owner address
+   if except owner anyone want to change ownership then he cant.
+
+                        Json ownership
+
+                        {
+                      "changeowner":{
+
+                          "owner_address":"ox1"
+                        }       
+                      
+                        }
+
+    */
+
+
+
+
 pub fn execute_change_ownership(
     deps: DepsMut,
     _env: Env,
@@ -339,6 +396,22 @@ pub fn execute_change_ownership(
     .add_attribute("owneraddress", config.owner);
     Ok (res)
 }
+
+/* execute_transfer_usd is custom function of token 
+   in which only owner can witdraw usd from smart contract. owner
+   need to pass amount in six decimal how much want to withdraw
+
+                   "execute transfer usd json"
+
+
+                    {
+                     "transfer_usd":{
+                         "amount":"1000000"
+                     }
+                        
+                    }
+   
+   */
 
 pub fn execute_transfer_usd(
     deps: DepsMut,
@@ -370,6 +443,26 @@ pub fn execute_transfer_usd(
 
 }
 
+
+/* execute_transfer_luna is custom function of token 
+   in which only owner can witdraw  luna  from smart contract. owner
+   need to pass amount in six decimal how much want to withdraw
+
+                    "execute transfer luna json"
+
+
+                     {
+                     "transfer_luna":{
+                         "amount":"1000000"
+                     }
+                        
+                    }
+   
+   
+   */
+
+
+
 pub fn execute_transfer_luna(
     deps: DepsMut,
     _env: Env,
@@ -399,6 +492,14 @@ pub fn execute_transfer_luna(
     
 
 }
+
+
+/* execute_transfer is standard function of cw20 token 
+   if you have token in your account then you can send it
+   to another address you need to pass amount and address where 
+   you want to send.*/
+
+
 
 pub fn execute_transfer(
     deps: DepsMut,
@@ -434,6 +535,13 @@ pub fn execute_transfer(
     Ok(res)
 }
 
+
+/* execute_burn is standard function of cw20 token 
+   this function will burn the token from total supply 
+   user only need to pass amount how much he want to burn it 
+*/
+
+
 pub fn execute_burn(
     deps: DepsMut,
     _env: Env,
@@ -464,6 +572,26 @@ pub fn execute_burn(
         .add_attribute("amount", amount);
     Ok(res)
 }
+
+/* execute_request is cw20 function of cw20 token 
+   this function will handle the sepcial request
+   of investor this function take two parameter one 
+   is recipient address thats is investor and second amount 
+   and thats amount will be without decimal number and only 
+   owner of contract can execute this function 
+
+            "execute_request json"
+
+            {
+                "request":{
+                    "amount":"1",
+                    "recipient":"0x17"
+                }
+
+            }
+
+*/
+
 pub fn execute_request(
     deps: DepsMut,
     _env: Env,
@@ -512,6 +640,23 @@ pub fn execute_request(
 
 
 }
+
+/* execute_seed is custom function of token in which any user 
+   can come and buy token the token price will be 0.003 luna 
+   this function take one 1 parameter thats is address but when you execute this 
+   function you need to send luna too. we set duration 18 month 
+   to end this function after that this function will not work
+      
+                "seed json"
+
+                {
+                    "seed":{
+                        "recipient":"0x17"
+                    }
+                }
+   
+   */
+
 pub fn execute_seed(
     deps: DepsMut,
     _env: Env,
@@ -578,6 +723,23 @@ pub fn execute_seed(
 
 }
 
+/* execute liquidity is custom function of token and this 
+   function only take two parameters one is recipient address 
+   and second is amount thats are number of token and this amount 
+   without decimal and only owner can execute this function. this function 
+   will not work if liquidity percentage used. 
+   
+                     "liquidity json"
+                     
+                     {
+                         "liquidit":{
+                             "recipient":"ox17",
+                             "amouunt":"1"
+                         }
+                     }
+
+   */
+
 pub fn execute_liquidity(
     deps: DepsMut,
     _env: Env,
@@ -632,6 +794,26 @@ pub fn execute_liquidity(
     Ok(res)
 }
     }
+
+
+/* this is custom function of token and this function only 
+   take two parameter one is recipient and second is amount 
+   thats will be without decimal if perentage of advisor used 
+   then this function will not be execute and only owner can execute 
+   this function. this function will start after 3 mnths and function will not
+   work after end time. 
+
+              "Advisor json"
+
+              {
+                  "advisor":{
+                      "recipient":"ox17",
+                      "amount":"1"
+                  }
+              }
+               
+   */
+
 
     pub fn execute_advisor(
         deps: DepsMut,
@@ -754,6 +936,32 @@ pub fn execute_liquidity(
         }
     }
 
+/* execute_launch is custom function of token this function
+   will take two parament one is address and second one is amount
+   and amount will be without decimal and this function only execute
+   by the owner if execute launch perentage used then this function not 
+   will be used further and only you can mint sepecific amount thats set
+   for month after end duration of this function then you cant execute futher.
+
+
+                             "launch json"
+
+                             {
+
+                             "launch":{
+
+                                 "recipient":"0x17",
+                                 "amount":"1"
+                             }
+
+                             }
+
+
+   */
+
+
+
+
 pub fn execute_launch(
     deps: DepsMut,
     _env: Env,
@@ -869,6 +1077,28 @@ BALANCES.update(
     }
 
 }
+
+/* execute_team is custom function of token this function
+   will take two parament one is address and second one is amount
+   and amount will be without decimal and this function only execute
+   by the owner if execute team perentage used then this function not 
+   will be used further and only you can mint sepecific amount thats set
+   for month after end duration of this function then you cant execute futher.
+
+                           "team json"
+
+
+                    {
+
+                        "team":{
+                            "recipient":"0x17",
+                            "amount":"1"
+                        }
+                    }
+                
+   */
+
+
 
 pub fn execute_team(
     deps: DepsMut,
@@ -987,6 +1217,26 @@ BALANCES.update(
 
 }
 
+/*  execute insurance is custom function of token and 
+    this function take two parameter so one is address 
+    like thats address token will transfer and second one 
+    is amount and the amount will be without decimal 
+    if the perentage of execute_insurance function used 
+    then this function will not execute further and only owner 
+    can execute this function 
+          
+                     "insurance json"
+
+                     {
+                         "insurance":{
+                             "recipient":"0x17",
+                             "amount":"1"
+                         }
+                     }
+    */
+
+
+
 pub fn execute_insurance(
     deps: DepsMut,
     _env: Env,
@@ -1039,6 +1289,25 @@ pub fn execute_insurance(
     Ok(res)
 }
     }
+
+/*  execute staking function is custom function of token 
+    this function will take two parameters so one is recipient 
+    address who will recieve these token and second one is amount and 
+    this amount will be without decimal. only owner can execute this function
+    if perentage of staking used then we cant execute this function furthermor
+               
+                    "staking json"
+
+                    {
+                        "staking":{
+
+                         "amount":"1",
+                         "recipient":"0x17",
+
+                        }
+                    }
+    
+    */
 
     pub fn execute_staking(
         deps: DepsMut,
@@ -1095,6 +1364,21 @@ pub fn execute_insurance(
     }
         }
 
+
+/* execcute ido is custom function of token and this 
+   function only take one parameter but this function 
+   also take amount of luna so if you snd 0.006 luna then you get one
+   token ido will be start after 6 month and have end month duration before time duration or after end duration
+   you cant execute this function if amount used of excute ido then you also cant execute further more ido.
+                               "ido json"
+                               
+                               {
+                                   "ido":{
+                                       "recipient":"1"
+                                   }
+                               }
+   
+   */        
 
  pub fn execute_ido(
     deps: DepsMut,
@@ -1162,6 +1446,13 @@ pub fn execute_insurance(
             return Err(ContractError::Idoduration{}); 
         }
  }
+
+
+/* 
+this function is standrad function of cw20 token only minter can execute this 
+function this function take two parameter one is amount thats will be in decimal and second 
+one is address.
+*/
         
 pub fn execute_mint(
     deps: DepsMut,
@@ -1202,6 +1493,15 @@ pub fn execute_mint(
         .add_attribute("amount", amount);
     Ok(res)
 }
+
+
+/*  this function is standard function of cw20 token 
+    this function help to send token to user to another smart
+    contract and execute other function of other smart contract 
+    thats encoded with base 64 this function will take three parameter 
+    one is address of contrat and second one is amount and thats amount 
+    will be in decimal and this one binary msg with encoded base 64. */ 
+
 
 pub fn execute_send(
     deps: DepsMut,
@@ -1246,6 +1546,10 @@ pub fn execute_send(
         );
     Ok(res)
 }
+
+/* this functio used for markting of contract and take optional parameter like
+   description marketing */
+
 
 pub fn execute_update_marketing(
     deps: DepsMut,
@@ -1300,6 +1604,10 @@ pub fn execute_update_marketing(
     Ok(res)
 }
 
+/* this function is used to update logo due to some issues we cant upload 
+   logo of token  so for this we need to make pull rquest of terra money brach 
+   there we need to upadte our info */
+
 pub fn execute_upload_logo(
     deps: DepsMut,
     _env: Env,
@@ -1334,6 +1642,36 @@ pub fn execute_upload_logo(
     let res = Response::new().add_attribute("action", "upload_logo");
     Ok(res)
 }
+
+/*         "checkbalance query json "
+                  
+              {
+                  "balance":{
+                      "address":"0x17"
+                  }
+              }
+                  
+
+   */
+
+    
+
+
+
+
+   /*
+                         "token_info query json"
+
+                         {
+                             "token_info":{
+                                 
+                             }
+                         }
+
+
+   */
+
+
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {

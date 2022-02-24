@@ -4,6 +4,7 @@ use cosmwasm_std::{Addr, Uint128};
 use cw_storage_plus::{Item, Map};
 use cw20::{AllowanceResponse, Logo, MarketingInfoResponse};
 
+// token info 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct TokenInfo {
