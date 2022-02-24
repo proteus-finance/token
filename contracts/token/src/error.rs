@@ -1,11 +1,11 @@
 use cosmwasm_std::StdError;
 use thiserror::Error;
-
+// there we define the errors there
 #[derive(Error, Debug, PartialEq)]
 pub enum ContractError {
     #[error("{0}")]
     Std(#[from] StdError),
-
+    //if ownership not matched then unathorized 
     #[error("Unauthorized")]
     Unauthorized {},
 
@@ -14,10 +14,10 @@ pub enum ContractError {
 
     #[error("Invalid zero amount")]
     InvalidZeroAmount {},
-
+    
     #[error("Allowance is expired")]
     Expired {},
-
+     // if you entered zero amount then invalid amount entered will show
     #[error("Invalid Amount Entered")]
     Invalid {},
 
@@ -50,7 +50,7 @@ pub enum ContractError {
 
     #[error("Time Ended")]
     TimeEnd {},
-
+   // if condition is not completed then this eoor will show
     #[error("6 Month not Completed")]
     TimeNotComplete {},
 

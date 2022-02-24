@@ -954,12 +954,11 @@ pub fn execute_liquidity(
                                  "amount":"1"
                              }
 
+
                              }
 
 
    */
-
-
 
 
 pub fn execute_launch(
@@ -1097,7 +1096,6 @@ BALANCES.update(
                     }
                 
    */
-
 
 
 pub fn execute_team(
@@ -1663,9 +1661,7 @@ pub fn execute_upload_logo(
                          "token_info query json"
 
                          {
-                             "token_info":{
-                                 
-                             }
+                             "token_info":{}
                          }
 
 
