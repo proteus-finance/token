@@ -72,10 +72,18 @@ cargo run-script optimize
 
 ## Seed
 
-- Seed function **_have 8_** percent of token supply
-- Seed function will take one parameter  recipient address thats will be in String
+- Seed function **_have 9_** percent of token supply
+- Seed function will take one parameter  invetsors object array 
 - Seed will directly start after deployment.
+- only owner can use this function.
 - Seed function will not work after 18 months of token deployment
+
+
+## Claim
+- In claim investor can withdraw his daily base amount.
+- user can claim only 1 time in 24 hours.
+- this function is will not work after 18 months.
+
 
 ## IDO
 
@@ -90,7 +98,7 @@ cargo run-script optimize
 
 ## Team
 
-- Team function **_have 18_** percent of token supply.
+- Team function **_have 17_** percent of token supply.
 - Team function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
 - Every month only **10 percent amount** of 20 percent of token can be through teaming.
 - Team function will not work after 23 months of token deployment.

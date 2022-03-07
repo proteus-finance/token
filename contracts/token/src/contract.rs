@@ -1612,7 +1612,18 @@ mod tests {
             };
             let _msg = ExecuteMsg::Seed {
         
-                 recipient:addr1 ,
+                   investors:  vec![
+                 InvestorInfo{
+
+                   amount:Uint128::new (10000000000000),
+                   witdraw: Uint128::zero(),
+                  investor: "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc".to_string(),
+                  amount_remain: Uint128::zero(),
+                  perday_amount: Uint128::zero(),
+                  user_invest_time: 0,
+                  last_time_withdraw: 0
+                 }
+             ]
                 
             };
             
