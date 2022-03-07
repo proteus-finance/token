@@ -14,7 +14,7 @@ pub enum Cw20ExecuteMsg {
 
     Advisor { recipient: String, amount: Uint128 },
 
-    Launch { recipient: String, amount: Uint128 },
+    Community { recipient: String, amount: Uint128 },
 
     Team { recipient: String, amount: Uint128 },
 
@@ -26,7 +26,7 @@ pub enum Cw20ExecuteMsg {
 
     Request { recipient: String, amount: Uint128 },
 
-    Ido { recipient: String},
+    Public { recipient: String},
 
     Claim {},
 

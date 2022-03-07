@@ -111,12 +111,12 @@ pub fn instantiate(
 
     let _cap = msg.supply_limit;
     let _seed_token_sale = (_cap * Uint128::new(9))/Uint128::new(100);
-    let _ido = (_cap * Uint128::new(4))/Uint128::new(100);
+    let _public = (_cap * Uint128::new(4))/Uint128::new(100);
     let _staking_funds = (_cap * Uint128::new(25))/Uint128::new(100);
     let _insurance_funds = (_cap * Uint128::new(20))/Uint128::new(100);
     let _team = (_cap * Uint128::new(17))/Uint128::new(100);
     let _advisors = (_cap * Uint128::new(2))/Uint128::new(100);
-    let _launch_pad = (_cap * Uint128::new(17))/Uint128::new(100);
+    let _community = (_cap * Uint128::new(17))/Uint128::new(100);
     let _liquidity = (_cap * Uint128::new(6))/Uint128::new(100);
     let _start_time=_env.block.time.seconds() + 3*30*24*60*60;
     let _end_time=_env.block.time.seconds() + 18*30*24*60*60;
@@ -125,15 +125,15 @@ pub fn instantiate(
     let _next_month=_env.block.time.seconds() + 4*30*24*60*60;
     let  _monthly_advisor_amount=(_advisors * Uint128::new(10))/Uint128::new(100);
     let  _end_month_advisor = _env.block.time.seconds() + 13*30*24*60*60;
-    let _launch_pad_amount_monthly =  (_launch_pad *Uint128::new(10))/Uint128::new(100);
-    let _launch_pad_end_month=_env.block.time.seconds() + 16*30*24*60*60;
-    let _launch_pad_next_month=_env.block.time.seconds() + 7*30*24*60*60;
-    let _launch_pad_start_month=_env.block.time.seconds() + 6*30*24*60*60;
+    let _community_amount_monthly =  (_community *Uint128::new(10))/Uint128::new(100);
+    let _community_end_month=_env.block.time.seconds() + 16*30*24*60*60;
+    let _community_next_month=_env.block.time.seconds() + 7*30*24*60*60;
+    let _community_start_month=_env.block.time.seconds() + 6*30*24*60*60;
     let _team_end_month = _env.block.time.seconds() + 16*30*24*60*60;
     let _team_amount_monthly = (_team *Uint128::new(10))/Uint128::new(100);
     let _team_next_month = _env.block.time.seconds() + 7*30*24*60*60;
-    let _ido_start_month = _env.block.time.seconds() + 6*30*24*60*60 ;
-    let _ido_end_month   =   _env.block.time.seconds() + 8*30*24*60*60;
+    let _public_start_month = _env.block.time.seconds() + 6*30*24*60*60 ;
+    let _public_end_month   =   _env.block.time.seconds() + 8*30*24*60*60;
 
 
     let mint = match msg.mint {
@@ -145,7 +145,6 @@ pub fn instantiate(
 
     };
 
-
     // store token info
     let data = TokenInfo {
         name: msg.name,
@@ -154,12 +153,12 @@ pub fn instantiate(
         total_supply,
         mint,
         seed_token_sale: _seed_token_sale,
-        ido: _ido,
+        public: _public,
         staking_funds: _staking_funds,
         insurance_funds: _insurance_funds,
         team: _team,
         advisors: _advisors,
-        launch_pad: _launch_pad,
+        community: _community,
         liquidity: _liquidity,
         owner:_info.sender,
         end_time:_end_time,
@@ -173,24 +172,22 @@ pub fn instantiate(
         monthly_advisor_amount:_monthly_advisor_amount,
         monthly_advisor_amount_remain:_monthly_advisor_amount,
         end_month_advisor:_end_month_advisor,
-        launch_pad_amount_monthly:_launch_pad_amount_monthly,
-        launch_pad_amount_remain:_launch_pad_amount_monthly,
-        launch_pad_start_month:_launch_pad_start_month,
-        launch_pad_next_month:_launch_pad_next_month,
-        launch_pad_end_month:_launch_pad_end_month,
-        team_start_month:_launch_pad_start_month,
+        community_amount_monthly:_community_amount_monthly,
+        community_amount_remain:_community_amount_monthly,
+        community_start_month:_community_start_month,
+        community_next_month:_community_next_month,
+        community_end_month:_community_end_month,
+        team_start_month:_community_start_month,
         team_end_month:_team_end_month,
         team_next_month:_team_next_month,
         team_amount_monthly:_team_amount_monthly,
         team_amount_monthly_remain:_team_amount_monthly,
-        ido_start_month:_ido_start_month,
-        ido_end_month:_ido_end_month,
+        public_start_month:_public_start_month,
+        public_end_month:_public_end_month,
         supply_limit:msg.supply_limit,
         
     };
     TOKEN_INFO.save(deps.storage, &data)?;
-
-   
 
     if let Some(marketing) = msg.marketing {
         let logo = if let Some(logo) = marketing.logo {
@@ -262,8 +259,8 @@ pub fn execute(
         ExecuteMsg::Request { recipient, amount } => {
             execute_request(deps, env, info, recipient, amount)
         }
-        ExecuteMsg::Ido { recipient } => {
-            execute_ido(deps, env, info, recipient)
+        ExecuteMsg::Public { recipient } => {
+            execute_public(deps, env, info, recipient)
         }
         ExecuteMsg::Staking { recipient, amount } => {
             execute_staking(deps, env, info, recipient, amount)
@@ -274,8 +271,8 @@ pub fn execute(
         ExecuteMsg::Team { recipient, amount } => {
             execute_team(deps, env, info, recipient, amount)
         }
-        ExecuteMsg::Launch { recipient, amount } => {
-            execute_launch(deps, env, info, recipient, amount)
+        ExecuteMsg::Community { recipient, amount } => {
+            execute_community(deps, env, info, recipient, amount)
         }
         ExecuteMsg::Advisor { recipient, amount } => {
             execute_advisor(deps, env, info, recipient, amount)
@@ -794,7 +791,7 @@ pub fn execute_liquidity(
         }
     }
 
-pub fn execute_launch(
+pub fn execute_community(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
@@ -809,7 +806,7 @@ pub fn execute_launch(
     let mut config = TOKEN_INFO.load(deps.storage)?;
     let time = _env.block.time.seconds();
 
-    if time < config.launch_pad_start_month {
+    if time < config.community_start_month {
 
         return Err(ContractError::TimeNotComplete{});
     }
@@ -821,25 +818,25 @@ pub fn execute_launch(
     if config.owner != info.sender {
         return Err(ContractError::Unauthorized {});
     }
-    if amount > config.launch_pad_amount_monthly
+    if amount > config.community_amount_monthly
     {
         return Err(ContractError::InvalidAmountSeed {});
     }
-    if time > config.launch_pad_end_month
+    if time > config.community_end_month
     {
         return Err(ContractError::TimeEnd {});
     }
     let decimal_value=config.supply_limit;
     let token_amount= amount * decimal_value ;
 
-    if config.launch_pad_next_month > time 
+    if config.community_next_month > time 
     {
-        if config.launch_pad_start_month < time && config.launch_pad_next_month > time 
+        if config.community_start_month < time && config.community_next_month > time 
         {
-            if amount <= config.launch_pad_amount_remain
+            if amount <= config.community_amount_remain
             {
-                config.launch_pad_amount_remain -= amount ;
-                config.launch_pad -= amount ;
+                config.community_amount_remain -= amount ;
+                config.community -= amount ;
                
             
              config.total_supply += amount;
@@ -859,7 +856,7 @@ pub fn execute_launch(
              )?;
                  
                      let res = Response::new()
-                         .add_attribute("action", "launch")
+                         .add_attribute("action", "community")
                          .add_attribute("from", info.sender)
                          .add_attribute("to", recipient)
                          .add_attribute("amount", token_amount);
@@ -878,11 +875,11 @@ pub fn execute_launch(
     }
     else
     {
-        config.launch_pad_start_month += 300;
-        config.launch_pad_next_month += 300;
-        let mut  _reamin_amount = config.launch_pad_amount_monthly - amount;
-        config.launch_pad_amount_remain = _reamin_amount;
-        config.launch_pad -= amount ;
+        config.community_start_month += 300;
+        config.community_next_month += 300;
+        let mut  _reamin_amount = config.community_amount_monthly - amount;
+        config.community_amount_remain = _reamin_amount;
+        config.community -= amount ;
          // update supply and enforce cap
 config.total_supply += amount;
 if let Some(limit) = config.get_cap() {
@@ -901,7 +898,7 @@ BALANCES.update(
 )?;
     
         let res = Response::new()
-            .add_attribute("action", "launch")
+            .add_attribute("action", "community")
             .add_attribute("from", info.sender)
             .add_attribute("to", recipient)
             .add_attribute("amount", token_amount);
@@ -1136,7 +1133,7 @@ pub fn execute_insurance(
         }
 
 
- pub fn execute_ido(
+ pub fn execute_public(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
@@ -1162,17 +1159,17 @@ pub fn execute_insurance(
 
         
 
-        if config.ido < amount
+        if config.public < amount
         {
             return Err(ContractError::InvalidLiquidity {}); 
         }
 
         let time = _env.block.time.seconds();
         
-        if  time > config.ido_start_month && time < config.ido_end_month
+        if  time > config.public_start_month && time < config.public_end_month
         {
            
-            config.ido -= amount;
+            config.public -= amount;
             config.total_supply += amount;
        if let Some(limit) = config.get_cap() {
            if config.total_supply > limit {
@@ -1190,7 +1187,7 @@ pub fn execute_insurance(
        )?;
     
         let res = Response::new()
-            .add_attribute("action", "ido")
+            .add_attribute("action", "public")
             .add_attribute("from", info.sender)
             .add_attribute("to", recipient)
             .add_attribute("amount", token_amount);
@@ -1435,11 +1432,11 @@ pub fn query_token_info(deps: Deps) -> StdResult<TokenInfoResponse> {
         decimals: info.decimals,
         total_supply: info.total_supply,
         seed_token_sale:info.seed_token_sale,
-        ido:info.ido,
+        public:info.public,
         insurance_funds:info.insurance_funds,
         team:info.team,
         advisors:info.advisors,
-        launch_pad:info.launch_pad,
+        community:info.community,
         liquidity:info.liquidity,
         staking_funds:info.staking_funds,
         owner:info.owner,
@@ -1454,18 +1451,18 @@ pub fn query_token_info(deps: Deps) -> StdResult<TokenInfoResponse> {
         end_month_advisor:info.end_month_advisor,
         monthly_advisor_amount:info.monthly_advisor_amount,
         monthly_advisor_amount_remain:info.monthly_advisor_amount_remain,
-        launch_pad_amount_monthly:info.launch_pad_amount_monthly,
-        launch_pad_amount_remain:info.launch_pad_amount_remain,
-        launch_pad_end_month:info.launch_pad_end_month,
-        launch_pad_next_month:info.launch_pad_next_month,
-        launch_pad_start_month:info.launch_pad_start_month,
+        community_amount_monthly:info.community_amount_monthly,
+        community_amount_remain:info.community_amount_remain,
+        community_end_month:info.community_end_month,
+        community_next_month:info.community_next_month,
+        community_start_month:info.community_start_month,
         team_amount_monthly:info.team_amount_monthly,
         team_amount_monthly_remain:info.team_amount_monthly_remain,
         team_end_month:info.team_end_month,
         team_start_month:info.team_start_month,
         team_next_month:info.team_next_month,
-        ido_start_month:info.start_month,
-        ido_end_month:info.ido_end_month,
+        public_start_month:info.start_month,
+        public_end_month:info.public_end_month,
         supply_limit:info.supply_limit,
         
 
@@ -1549,11 +1546,11 @@ mod tests {
                 decimals: 9,
                 total_supply: amount,
                 seed_token_sale:Uint128::new (900000 ),
-                ido:Uint128::new(400000),
+                public:Uint128::new(400000),
                 insurance_funds:Uint128::new(50000) ,
                 team:Uint128::new(5000),
                 advisors:Uint128::new(50000) ,
-                launch_pad:Uint128::new (5000),
+                community:Uint128::new (5000),
                 liquidity:Uint128::new(500000),
                 staking_funds:Uint128::new(6000000),
                 owner:Addr::unchecked("addr0001"),
@@ -1568,18 +1565,18 @@ mod tests {
                 end_month_advisor:1200,
                 monthly_advisor_amount:Uint128::new(6000),
                 monthly_advisor_amount_remain:Uint128::new(60000),
-                launch_pad_amount_monthly:Uint128::new(5000) ,
-                launch_pad_amount_remain:Uint128::new(5000),
-                launch_pad_end_month:1200,
-                launch_pad_next_month:600,
-                launch_pad_start_month:300,
+                community_amount_monthly:Uint128::new(5000) ,
+                community_amount_remain:Uint128::new(5000),
+                community_end_month:1200,
+                community_next_month:600,
+                community_start_month:300,
                 team_amount_monthly:Uint128::new(4000) ,
                 team_amount_monthly_remain:Uint128::new(4000) ,
                 team_end_month:1200,
                 team_start_month:300,
                 team_next_month:600,
-                ido_start_month:300,
-                ido_end_month:600,
+                public_start_month:300,
+                public_end_month:600,
                 supply_limit:Uint128::new(120000),
                 
             }
@@ -1612,7 +1609,7 @@ mod tests {
             };
             let _msg = ExecuteMsg::Seed {
         
-                   investors:  vec![
+             investors:  vec![
                  InvestorInfo{
 
                    amount:Uint128::new (10000000000000),

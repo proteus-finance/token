@@ -88,7 +88,7 @@ cargo run-script optimize
 
 
 
-## IDO
+## Public
 
 - IDO function **_have 4_** percent of token supply.
 - IDO function will take one parameter  recipient  address thats will be in String.
@@ -115,7 +115,7 @@ cargo run-script optimize
 - Advisor function will not work after 13 months of token deployment.
 - Advisor function only will work after the six months of deployment of token.
 
-## Launchpad
+## Community
 
 - Launchpad function **_have 17_** percent of token supply.
 - Launchpad function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.

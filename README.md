@@ -14,7 +14,7 @@ benefits of this new financial system.
 
 - Selected VCs and value-added investors. Linear monthly vesting for 18 months .the percentage of seed is 9 percent 
 
-- IDOs for Terra communities and Vesting terms will vary – 6 – 8 months or Price: $0.06 per token. And percentage of Ido 4 percent.
+- Public for Terra communities and Vesting terms will vary – 6 – 8 months or Price: $0.06 per token. And percentage of Ido 4 percent.
 
 - Rewards for Proteus stakers and LP stakers. Only enough tokens will be unlocked to subsidize initial Proteus staking rewards until Proteus Finance earns enough yield fees to pay rewards from that source and its percntage is  25 percent.
 
