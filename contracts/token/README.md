@@ -85,6 +85,9 @@ cargo run-script optimize
 - this function is will not work after 18 months.
 
 
+
+
+
 ## IDO
 
 - IDO function **_have 4_** percent of token supply.
