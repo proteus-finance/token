@@ -12,7 +12,7 @@ benefits of this new financial system.
 
 ## Protesus TokenNomics
 
-- Selected VCs and value-added investors. Linear monthly vesting for 18 months . Price: $0.03 per token. the percentage of seed is 8 percent 
+- Selected VCs and value-added investors. Linear monthly vesting for 18 months .the percentage of seed is 9 percent 
 
 - IDOs for Terra communities and Vesting terms will vary – 6 – 8 months or Price: $0.06 per token. And percentage of Ido 4 percent.
 
@@ -21,7 +21,7 @@ benefits of this new financial system.
 - Payouts for insurance holders Tokens will be released for the investors if insurance is needed and the Insurance percentage is 20 percent.
 
 - Token allocation to Proteus Finance core team .8% vested monthly from the 10th month after the TGE. Last month 4%.
-(23 months total vesting period). and its total percentage will be 18 percent.
+(23 months total vesting period). and its total percentage will be 17 percent.
 
 - Token allocation to Proteus Finance Advisors 5% vested monthly from the 3th month after the TGE (23 months total
 vesting period) and advisor total percentage will be 2 percent.
