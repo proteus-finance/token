@@ -1,7 +1,9 @@
-use cosmwasm_std::{StdError, StdResult, Uint128};
+use cosmwasm_std::{StdError, StdResult, Uint128,Binary,Addr};
 use cw20::{Cw20Coin, Logo, MinterResponse};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+//use cosmwasm_std::{Binary, Uint128,Addr};
+use cw0::Expiration;
 
 pub use cw20::Cw20ExecuteMsg as ExecuteMsg;
 
@@ -72,8 +74,12 @@ fn is_valid_symbol(symbol: &str) -> bool {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
+
+ 
     /// Returns the current balance of the given address, 0 if unset.
     /// Return type: BalanceResponse.
+    InvestorInfo { investor : String},
+
     Balance { address: String },
     /// Returns metadata on the contract - name, decimals, supply, etc.
     /// Return type: TokenInfoResponse.
@@ -112,3 +118,4 @@ pub enum QueryMsg {
     /// Return type: DownloadLogoResponse.
     DownloadLogo {},
 }
+

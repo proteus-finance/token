@@ -3,8 +3,12 @@ use serde::{Deserialize, Serialize};
 use cosmwasm_std::{Addr, Uint128};
 use cw_storage_plus::{Item, Map};
 use cw20::{AllowanceResponse, Logo, MarketingInfoResponse};
+use cw20::msg::{InvestorInfo};
+use cosmwasm_storage::{singleton, singleton_read, Bucket, ReadonlyBucket};
+use cosmwasm_std::StdResult;
+use cosmwasm_std::CanonicalAddr;
+use cosmwasm_std::Storage;
 
-// token info 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub struct TokenInfo {
@@ -46,8 +50,10 @@ pub struct TokenInfo {
     pub ido_start_month:u64,
     pub ido_end_month:u64,
     pub supply_limit:Uint128,
-
 }
+
+static PREFIX_REWARD: &[u8] = b"reward";
+
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct MinterData {
@@ -61,6 +67,31 @@ impl TokenInfo {
         self.mint.as_ref().and_then(|v| v.cap)
     }
 }
+
+pub fn store_investor_info(
+    storage: &mut dyn Storage,
+    owner: &CanonicalAddr,
+    investor_info: &InvestorInfo,
+) -> StdResult<()> {
+    Bucket::new(storage, PREFIX_REWARD).save(owner, investor_info)
+}
+
+pub fn read_investor_info(storage: &dyn Storage, owner:&CanonicalAddr) -> StdResult<InvestorInfo> {
+    match ReadonlyBucket::new(storage, PREFIX_REWARD).may_load(owner.as_slice())? {
+        Some(investor_info) => Ok(investor_info),
+        None => Ok(InvestorInfo {
+            investor:owner.to_string(),
+            amount:Uint128::zero(),
+            witdraw:Uint128::zero(),
+            perday_amount:Uint128::zero(),
+            last_time_withdraw:0,
+            amount_remain:Uint128::zero(),
+            user_invest_time:0,
+
+        }),
+    }
+}
+
 
 pub const TOKEN_INFO: Item<TokenInfo> = Item::new("token_info");
 pub const MARKETING_INFO: Item<MarketingInfoResponse> = Item::new("marketing_info");

@@ -5,6 +5,7 @@ use cosmwasm_std::{Addr, Binary, Uint128};
 
 use crate::logo::LogoInfo;
 use cw0::Expiration;
+use cosmwasm_std::CanonicalAddr;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -12,6 +13,10 @@ pub enum Cw20QueryMsg {
     /// Returns the current balance of the given address, 0 if unset.
     /// Return type: BalanceResponse.
     Balance { address: String },
+
+
+
+    InvestorInfo{address:String} ,   
     /// Returns metadata on the contract - name, decimals, supply, etc.
     /// Return type: TokenInfoResponse.
     TokenInfo {},
@@ -147,4 +152,15 @@ pub struct AllAllowancesResponse {
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug, Default)]
 pub struct AllAccountsResponse {
     pub accounts: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct InvestorInfoResponse {
+    pub investor:String,
+    pub amount: Uint128,
+    pub witdraw:Uint128,
+    pub last_time_withdraw:u64,
+    pub amount_remain:Uint128,
+    pub perday_amount:Uint128,
+    pub user_invest_time:u64,
 }

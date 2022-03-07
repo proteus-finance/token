@@ -560,7 +560,7 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo,) -> StdResul
     if staker_info.tire == Uint128::zero()
     {  
       amount = staker_info.stake_amount;
-    //  amount =Decimal:: multiply_ratio(staker_info.stake_amount,1000);
+  
     }
    
     if staker_info.tire == Uint128::new(1)
@@ -619,7 +619,7 @@ pub fn withdraw_locked (deps: DepsMut, env: Env, info: MessageInfo,) -> StdResul
             amount = staker_info.stake_amount + (total_value  * Uint128::from(1 as u128));
         }
      
-    // let percentage_per_sec= 10/(60*60*24*365);
+  
     
     }
 
@@ -998,9 +998,9 @@ pub fn execute_transfer_luna(
 
    */
 
-   
+                   
 
-
+    
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {

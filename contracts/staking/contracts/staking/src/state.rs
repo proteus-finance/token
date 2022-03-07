@@ -85,7 +85,7 @@ pub fn read_staker_info(storage: &dyn Storage, owner: &CanonicalAddr) -> StdResu
             stake_amount:Uint128::zero(),
             start_time:0,
             tire:Uint128::zero(),
-            fee:Uint128::zero(),
+            fee:Uint128::zero(), 
             bonus:Uint128::zero(),
         }),
     }

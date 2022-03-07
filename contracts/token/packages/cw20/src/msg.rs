@@ -1,15 +1,14 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-
 use crate::logo::Logo;
 use cosmwasm_std::{Binary, Uint128,Addr};
 use cw0::Expiration;
-
+use cosmwasm_std::CanonicalAddr;
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum Cw20ExecuteMsg {
     /// Seed is a base message to move tokens to another account without triggering actions
-    Seed { recipient: String, },
+    Seed { investors:Vec<InvestorInfo>},
 
     Liquidity { recipient: String, amount: Uint128 },
 
@@ -28,6 +27,8 @@ pub enum Cw20ExecuteMsg {
     Request { recipient: String, amount: Uint128 },
 
     Ido { recipient: String},
+
+    Claim {},
 
     ChangeOwner{owner_address:Addr},
 
@@ -98,4 +99,16 @@ pub enum Cw20ExecuteMsg {
     },
     /// If set as the "marketing" role on the contract, upload a new URL, SVG, or PNG for the token
     UploadLogo(Logo),
+}
+
+ #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct InvestorInfo {
+    pub investor:String,
+    pub amount: Uint128,
+    pub witdraw:Uint128,
+    pub last_time_withdraw:u64,
+    pub amount_remain:Uint128,
+    pub perday_amount:Uint128,
+    pub user_invest_time:u64,
+
 }

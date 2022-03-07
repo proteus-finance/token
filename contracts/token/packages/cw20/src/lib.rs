@@ -1,5 +1,4 @@
 pub use cw0::Expiration;
-
 pub use crate::balance::Balance;
 pub use crate::coin::{Cw20Coin, Cw20CoinVerified};
 pub use crate::denom::Denom;
@@ -11,14 +10,13 @@ pub use crate::query::{
     Cw20QueryMsg, DownloadLogoResponse, MarketingInfoResponse, MinterResponse, TokenInfoResponse,
 };
 pub use crate::receiver::Cw20ReceiveMsg;
-
 mod balance;
 mod coin;
 mod denom;
 mod helpers;
 mod logo;
-mod msg;
-mod query;
+pub mod msg;
+pub mod query;
 mod receiver;
 
 #[cfg(test)]
