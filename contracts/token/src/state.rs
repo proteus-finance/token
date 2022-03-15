@@ -87,7 +87,7 @@ pub fn read_investor_info(storage: &dyn Storage, owner:&CanonicalAddr) -> StdRes
             last_time_withdraw:0,
             amount_remain:Uint128::zero(),
             user_invest_time:0,
-
+            first_claim:Uint128::zero(),
         }),
     }
 }

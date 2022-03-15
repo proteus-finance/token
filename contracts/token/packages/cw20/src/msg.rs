@@ -110,5 +110,6 @@ pub struct InvestorInfo {
     pub amount_remain:Uint128,
     pub perday_amount:Uint128,
     pub user_invest_time:u64,
+    pub first_claim:Uint128,
 
 }

@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Uint128,Addr,BankMsg,Coin,CosmosMsg
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult, Uint128,Addr,BankMsg,Coin,CosmosMsg,Decimal
 };
 use cw2::set_contract_version;
 use cw20::{
@@ -118,22 +118,20 @@ pub fn instantiate(
     let _advisors = (_cap * Uint128::new(2))/Uint128::new(100);
     let _community = (_cap * Uint128::new(17))/Uint128::new(100);
     let _liquidity = (_cap * Uint128::new(6))/Uint128::new(100);
-    let _start_time=_env.block.time.seconds() + 3*30*24*60*60;
-    let _end_time=_env.block.time.seconds() + 18*30*24*60*60;
+    let _start_time=_env.block.time.seconds() + 3*(30*24*60*60);// 3 month
+    let _end_time=_env.block.time.seconds() + 18*(30*24*60*60);// 18 month
     let _mothly_seed=(_seed_token_sale * Uint128::new(5))/Uint128::new(100);
-    let _three_month_period=_env.block.time.seconds() + 3*30*24*60*60;
-    let _next_month=_env.block.time.seconds() + 4*30*24*60*60;
+    let _three_month_period=_env.block.time.seconds() + 3*(30*24*60*60);//three month period
+    let _next_month=_env.block.time.seconds() + 4*(30*24*60*60);//4 month period
     let  _monthly_advisor_amount=(_advisors * Uint128::new(10))/Uint128::new(100);
-    let  _end_month_advisor = _env.block.time.seconds() + 13*30*24*60*60;
+    let  _end_month_advisor = _env.block.time.seconds() + 13*(30*24*60*60);//13 month period
     let _community_amount_monthly =  (_community *Uint128::new(10))/Uint128::new(100);
-    let _community_end_month=_env.block.time.seconds() + 16*30*24*60*60;
-    let _community_next_month=_env.block.time.seconds() + 7*30*24*60*60;
-    let _community_start_month=_env.block.time.seconds() + 6*30*24*60*60;
-    let _team_end_month = _env.block.time.seconds() + 16*30*24*60*60;
+    let _community_end_month=_env.block.time.seconds() + 16*(30*24*60*60);//16 month period
+    let _community_next_month=_env.block.time.seconds() + 7*(30*24*60*60);// 7 month period
+    let _community_start_month=_env.block.time.seconds() + 6*(30*24*60*60); //6 monh period 
+    let _team_end_month = _env.block.time.seconds() + 16*(30*24*60*60);   // 16 month period
     let _team_amount_monthly = (_team *Uint128::new(10))/Uint128::new(100);
-    let _team_next_month = _env.block.time.seconds() + 7*30*24*60*60;
-    let _public_start_month = _env.block.time.seconds() + 6*30*24*60*60 ;
-    let _public_end_month   =   _env.block.time.seconds() + 8*30*24*60*60;
+    let _public_end_month   =   _env.block.time.seconds() + 8*(30*24*60*60);// 8 months
 
 
     let mint = match msg.mint {
@@ -179,10 +177,10 @@ pub fn instantiate(
         community_end_month:_community_end_month,
         team_start_month:_community_start_month,
         team_end_month:_team_end_month,
-        team_next_month:_team_next_month,
+        team_next_month:_community_next_month,
         team_amount_monthly:_team_amount_monthly,
         team_amount_monthly_remain:_team_amount_monthly,
-        public_start_month:_public_start_month,
+        public_start_month:_community_start_month,
         public_end_month:_public_end_month,
         supply_limit:msg.supply_limit,
         
@@ -545,6 +543,7 @@ pub fn execute_seed(
         investor_info.user_invest_time =  time;
         investor_info.perday_amount= investor_info.amount / Uint128::new(calculate_total_days as u128);
         investor_info.amount_remain +=element.amount;
+        investor_info.first_claim=element.first_claim;
         store_investor_info(deps.storage, &sender_addr, &investor_info)?;
     }
 
@@ -569,31 +568,51 @@ pub fn execute_claim(
     let mut investor_info = read_investor_info(deps.storage,&sender_addr_raw )?;
     let  config = TOKEN_INFO.load(deps.storage)?;
     let mut  total_vestingdays = 0;
+    let mut  total_amount = Uint128::zero();
     if time > config.end_time
     {
         return Err(ContractError::Unauthorized {});
-    }
-    if  time < investor_info.last_time_withdraw + onedaysec
-    {
-        return Err(ContractError::InvalidLiquidity {});
     }
     if  investor_info.amount_remain == Uint128::zero()
     {
         return Err(ContractError::InvalidLiquidity {});
     }
-    if investor_info.last_time_withdraw == 0
+    if time < investor_info.last_time_withdraw + onedaysec
     {
-      total_vestingdays = 1;
-
+        return Err(ContractError::InvalidLiquidity {});
     }
+
+    if investor_info.first_claim != Uint128::zero()
+    {
+      
+      
+       total_amount =investor_info.first_claim;
+        investor_info.first_claim = Uint128::zero();
+     
+    }
+
     else
     {
-     
-        total_vestingdays = (time - investor_info.last_time_withdraw) / onedaysec ;
-        
-    }
+
+      
+        if investor_info.last_time_withdraw == 0
+        {
+          total_vestingdays = 1;
     
-    let total_amount = investor_info.perday_amount * Uint128::new ( total_vestingdays as u128);
+        }
+        else
+        {
+         
+            total_vestingdays = (time - investor_info.last_time_withdraw) / onedaysec ;
+            
+        }
+        
+         total_amount = investor_info.perday_amount * Uint128::new ( total_vestingdays as u128);
+
+    }
+
+
+   
     
     investor_info.amount_remain -=  total_amount;
     investor_info.last_time_withdraw = time ;
@@ -1412,6 +1431,7 @@ pub fn query_investor_info(
         perday_amount:investor_info.perday_amount,
         last_time_withdraw:investor_info.last_time_withdraw,
         user_invest_time:investor_info.user_invest_time,
+        first_claim:investor_info.first_claim,
        
     })
 }
