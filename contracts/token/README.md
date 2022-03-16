@@ -69,6 +69,31 @@ cargo run-script optimize
 - so now you deployed succesfully smart contract on terra blockchain
 
 ---
+                     
+
+                     Initate Json
+```sh
+{
+  "name": "Proteus Token",
+  "symbol": "PROTEUS",
+  "supply_limit": "1000000",
+  "decimals": 6,
+  "marketing": {
+    "marketing": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+  },
+  "minter": {
+    "minter": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc",
+    "cap": "1000000"
+  },
+  "initial_balances": [
+    {
+      "amount": "0",
+      "address": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+  ]
+}
+```
+
 
 ## Seed
 
@@ -78,14 +103,42 @@ cargo run-script optimize
 - only owner can use this function.
 - Seed function will not work after 18 months of token deployment
 
+               Seed Json
+
+```sh          
+{
+  "seed": {
+    "investors": [
+      {
+        "amount": "10000000000000",
+        "witdraw": "0",
+        "investor": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc",
+        "first_claim": true,
+        "amount_remain": "0",
+        "perday_amount": "0",
+        "user_invest_time": 0,
+        "last_time_withdraw": 0
+      }
+    ]
+  }
+}
+```
+
+
 
 ## Claim
 - In claim investor can withdraw his daily base amount.
 - user can claim only 1 time in 24 hours.
 - this function is will not work after 18 months.
+ 
 
+          Claim Json
 
-
+```sh
+{
+  "claim": {}
+}
+```
 
 
 ## Public
@@ -93,11 +146,31 @@ cargo run-script optimize
 - IDO function **_have 4_** percent of token supply.
 - IDO function will take one parameter  recipient  address thats will be in String.
 - IDO function will work from 6 to 8 momth .
+            
+             Public Json
+```sh             
+{
+    "public":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```
 
 ## Staking Fund
 
 - Staking function **_have 25_** percent of token supply.
 - Staking function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
+                         Staking Json
+
+```sh             
+{
+    "staking":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```
 
 ## Team
 
@@ -107,6 +180,17 @@ cargo run-script optimize
 - Team function will not work after 23 months of token deployment.
 - Team function only will work after the six months of deployment of token.
 
+                      Team Json
+
+```sh             
+{
+    "team":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```
+
 ## Advisor
 
 - Advisor function **_have 2_** percent of token supply.
@@ -114,6 +198,17 @@ cargo run-script optimize
 - Every month only **10 percent amount** of 2 percent of token can be through advising.
 - Advisor function will not work after 13 months of token deployment.
 - Advisor function only will work after the six months of deployment of token.
+    
+                     Advisor Json
+
+```sh             
+{
+    "advisor":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```                     
 
 ## Community
 
@@ -122,14 +217,45 @@ cargo run-script optimize
 - Every month only **10 percent amount** of 15 percent of token can be through advising.
 - Launchpad function will not work after 16 months of token deployment.
 - Launchpad function only will work after the six months of deployment of token.
+                    
+                        Community Json
+
+```sh             
+{
+    "community":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```                    
 
 ## Liquidity
 
 - Liquidity function **_have 6_** percent of token supply.
 - Liquidity function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
 
+                               Liquidity Json
+                    
+```sh             
+{
+    "liquidity":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```  
+
 ## Insurance
 
 - Insurance function **_have 2_** percent of token supply.
 - Insurance function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
+                                        Insurance Json
 
+```sh             
+{
+    "insurance":{
+        "amount":"10",
+        "recipient":"terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc"
+    }
+}
+```                                          

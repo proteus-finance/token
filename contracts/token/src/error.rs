@@ -60,4 +60,7 @@ pub enum ContractError {
     #[error("the price of token is higher")]
     PriceToken {},
 
+    #[error("Invalid Amount")]
+    InvalidAmount {},
+
 }

@@ -26,7 +26,7 @@ pub enum Cw20ExecuteMsg {
 
     Request { recipient: String, amount: Uint128 },
 
-    Public { recipient: String},
+    Public { recipient: String,amount:Uint128},
 
     Claim {},
 
