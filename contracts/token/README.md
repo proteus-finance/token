@@ -70,8 +70,8 @@ cargo run-script optimize
 
 ---
                      
+Initate Json
 
-                     Initate Json
 ```sh
 {
   "name": "Proteus Token",
@@ -103,7 +103,7 @@ cargo run-script optimize
 - only owner can use this function.
 - Seed function will not work after 18 months of token deployment
 
-               Seed Json
+Seed Json
 
 ```sh          
 {
@@ -119,14 +119,14 @@ cargo run-script optimize
 ```
 
 
-
 ## Public
 
 - IDO function **_have 4_** percent of token supply.
 - IDO function will take one parameter  recipient  address thats will be in String.
 - IDO function will work from 6 to 8 momth .
             
-             Public Json
+Public Json
+
 ```sh             
 {
     "public":{
@@ -140,7 +140,8 @@ cargo run-script optimize
 
 - Staking function **_have 25_** percent of token supply.
 - Staking function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String.
-                         Staking Json
+
+Staking Json
 
 ```sh             
 {
@@ -159,7 +160,7 @@ cargo run-script optimize
 - Team function will not work after 23 months of token deployment.
 - Team function only will work after the six months of deployment of token.
 
-                      Team Json
+Team Json
 
 ```sh             
 {
@@ -178,7 +179,7 @@ cargo run-script optimize
 - Advisor function will not work after 13 months of token deployment.
 - Advisor function only will work after the six months of deployment of token.
     
-                     Advisor Json
+Advisor Json
 
 ```sh             
 {
@@ -197,7 +198,7 @@ cargo run-script optimize
 - Launchpad function will not work after 16 months of token deployment.
 - Launchpad function only will work after the six months of deployment of token.
                     
-                        Community Json
+Community Json
 
 ```sh             
 {
@@ -213,7 +214,7 @@ cargo run-script optimize
 - Liquidity function **_have 6_** percent of token supply.
 - Liquidity function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
 
-                               Liquidity Json
+Liquidity Json
                     
 ```sh             
 {
@@ -228,7 +229,8 @@ cargo run-script optimize
 
 - Insurance function **_have 2_** percent of token supply.
 - Insurance function will take two parameter one is amount thats will be in **_Uint128_** and recipient address thats will be in String
-                                        Insurance Json
+
+Insurance Json
 
 ```sh             
 {
