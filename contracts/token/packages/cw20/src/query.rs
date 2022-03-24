@@ -150,11 +150,10 @@ pub struct AllAccountsResponse {
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct InvestorInfoResponse {
     pub investor:String,
-    pub amount: Uint128,
-    pub witdraw:Uint128,
-    pub last_time_withdraw:u64,
-    pub amount_remain:Uint128,
-    pub perday_amount:Uint128,
-    pub user_invest_time:u64,
-    pub first_claim:Uint128,
+    pub amount_given: Uint128,
+    // pub last_time_withdraw:u64,
+    // pub amount_remain:Uint128,
+    // pub perday_amount:Uint128,
+    // pub user_invest_time:u64,
+    // pub first_claim:Uint128,
 }

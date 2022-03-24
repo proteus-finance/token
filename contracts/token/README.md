@@ -110,35 +110,14 @@ cargo run-script optimize
   "seed": {
     "investors": [
       {
-        "amount": "10000000000000",
-        "witdraw": "0",
+        "amount": "10,
         "investor": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc",
-        "first_claim": true,
-        "amount_remain": "0",
-        "perday_amount": "0",
-        "user_invest_time": 0,
-        "last_time_withdraw": 0
       }
     ]
   }
 }
 ```
 
-
-
-## Claim
-- In claim investor can withdraw his daily base amount.
-- user can claim only 1 time in 24 hours.
-- this function is will not work after 18 months.
- 
-
-          Claim Json
-
-```sh
-{
-  "claim": {}
-}
-```
 
 
 ## Public

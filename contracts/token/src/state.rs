@@ -74,13 +74,7 @@ pub fn read_investor_info(storage: &dyn Storage, owner:&CanonicalAddr) -> StdRes
         Some(investor_info) => Ok(investor_info),
         None => Ok(InvestorInfo {
             investor:owner.to_string(),
-            amount:Uint128::zero(),
-            witdraw:Uint128::zero(),
-            perday_amount:Uint128::zero(),
-            last_time_withdraw:0,
-            amount_remain:Uint128::zero(),
-            user_invest_time:0,
-            first_claim:Uint128::zero(),
+            amount_given:Uint128::zero(),
         }),
     }
 }

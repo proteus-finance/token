@@ -242,9 +242,9 @@ pub fn execute(
         }
 
 
-        ExecuteMsg::Claim { } => {
-            execute_claim(deps, env, info )
-        }
+        // ExecuteMsg::Claim { } => {
+        //     execute_claim(deps, env, info )
+        // }
 
         ExecuteMsg::Request { recipient, amount } => {
             execute_request(deps, env, info, recipient, amount)
@@ -511,7 +511,8 @@ pub fn execute_seed(
     investors: Vec<InvestorInfo>,
 )-> Result<Response,ContractError>
 {
-    let  config = TOKEN_INFO.load(deps.storage)?;
+    let mut config = TOKEN_INFO.load(deps.storage)?;
+    let decimal_value=config.supply_limit;
     let time = _env.block.time.seconds();
     if config.owner != info.sender 
     {
@@ -521,22 +522,48 @@ pub fn execute_seed(
     {
         return Err(ContractError::Unauthorized {});
     }
-    let onedaysec=24*60*60; //one day sec , testing purpose
-    let calculate=config.end_time-time;
-    let calculate_total_days=calculate/onedaysec;
+
+    // let onedaysec=24*60*60; //one day sec , testing purpose
+    // let calculate=config.end_time-time;
+    // let calculate_total_days=calculate/onedaysec;
     for element in investors
     {
        
+        if element.amount_given > config.seed_token_sale
+        {
+            return Err(ContractError::InvalidAmount {});
+        }
+        let token_amount= element.amount_given * decimal_value ;
+       
         let sender_addr = deps.api.addr_canonicalize(element.investor.as_str())?;
         let mut investor_info = read_investor_info(deps.storage, &sender_addr)?;
-        investor_info.amount  += element.amount;
-        investor_info.witdraw +=investor_info.witdraw;
-        investor_info.last_time_withdraw=investor_info.last_time_withdraw; 
-        investor_info.user_invest_time =  time;
-        investor_info.perday_amount= investor_info.amount / Uint128::new(calculate_total_days as u128);
-        investor_info.amount_remain +=element.amount;
-        investor_info.first_claim=element.first_claim;
+        investor_info.amount_given  += token_amount;
+
+
         store_investor_info(deps.storage, &sender_addr, &investor_info)?;
+
+          // add amount to recipient balance
+        config.total_supply += token_amount;
+        if let Some(limit) = config.get_cap() {
+       if config.total_supply > limit {
+           return Err(ContractError::CannotExceedCap {});
+        }
+        }
+         TOKEN_INFO.save(deps.storage, &config)?;
+                     
+        let rcpt_addr = deps.api.addr_validate(&element.investor)?;
+        BALANCES.update(
+        deps.storage,
+        &rcpt_addr,
+        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() +token_amount ) },
+        )?;
+        // investor_info.witdraw +=investor_info.witdraw;
+        // investor_info.last_time_withdraw=investor_info.last_time_withdraw; 
+        // investor_info.user_invest_time =  time;
+        // investor_info.perday_amount= investor_info.amount / Uint128::new(calculate_total_days as u128);
+        // investor_info.amount_remain +=element.amount;
+        // investor_info.first_claim=element.first_claim;
+        
     }
 
 
@@ -548,81 +575,81 @@ pub fn execute_seed(
 
 }
 
-pub fn execute_claim(
-    deps: DepsMut,
-    _env: Env,
-    info: MessageInfo,
-)-> Result<Response, ContractError>
-{
-    let sender_addr_raw = deps.api.addr_canonicalize(info.sender.as_str())?;
-    let onedaysec=24*60*60;
-    let time = _env.block.time.seconds();
-    let mut investor_info = read_investor_info(deps.storage,&sender_addr_raw )?;
-    let  config = TOKEN_INFO.load(deps.storage)?;
-    let mut  total_vestingdays = 0;
-    let mut  total_amount = Uint128::zero();
-    if time > config.end_time
-    {
-        return Err(ContractError::Unauthorized {});
-    }
-    if  investor_info.amount_remain == Uint128::zero()
-    {
-        return Err(ContractError::InvalidLiquidity {});
-    }
-    if time < investor_info.last_time_withdraw + onedaysec
-    {
-        return Err(ContractError::InvalidLiquidity {});
-    }
+// pub fn execute_claim(
+//     deps: DepsMut,
+//     _env: Env,
+//     info: MessageInfo,
+// )-> Result<Response, ContractError>
+// {
+//     let sender_addr_raw = deps.api.addr_canonicalize(info.sender.as_str())?;
+//     let onedaysec=24*60*60;
+//     let time = _env.block.time.seconds();
+//     let mut investor_info = read_investor_info(deps.storage,&sender_addr_raw )?;
+//     let  config = TOKEN_INFO.load(deps.storage)?;
+//     let mut  total_vestingdays = 0;
+//     let mut  total_amount = Uint128::zero();
+//     if time > config.end_time
+//     {
+//         return Err(ContractError::Unauthorized {});
+//     }
+//     if  investor_info.amount_remain == Uint128::zero()
+//     {
+//         return Err(ContractError::InvalidLiquidity {});
+//     }
+//     if time < investor_info.last_time_withdraw + onedaysec
+//     {
+//         return Err(ContractError::InvalidLiquidity {});
+//     }
 
-    if investor_info.first_claim != Uint128::zero()
-    {
+//     if investor_info.first_claim != Uint128::zero()
+//     {
       
       
-       total_amount =investor_info.first_claim;
-        investor_info.first_claim = Uint128::zero();
+//        total_amount =investor_info.first_claim;
+//         investor_info.first_claim = Uint128::zero();
      
-    }
+//     }
 
-    else
-    {
+//     else
+//     {
 
       
-        if investor_info.last_time_withdraw == 0
-        {
-          total_vestingdays = 1;
+//         if investor_info.last_time_withdraw == 0
+//         {
+//           total_vestingdays = 1;
     
-        }
-        else
-        {
+//         }
+//         else
+//         {
          
-            total_vestingdays = (time - investor_info.last_time_withdraw) / onedaysec ;
+//             total_vestingdays = (time - investor_info.last_time_withdraw) / onedaysec ;
             
-        }
+//         }
         
-         total_amount = investor_info.perday_amount * Uint128::new ( total_vestingdays as u128);
+//          total_amount = investor_info.perday_amount * Uint128::new ( total_vestingdays as u128);
 
-    }
+//     }
 
 
    
     
-    investor_info.amount_remain -=  total_amount;
-    investor_info.last_time_withdraw = time ;
-    store_investor_info(deps.storage, &sender_addr_raw, &investor_info)?;
-    let rcpt_addr = deps.api.addr_validate(&info.sender.to_string())?;
+//     investor_info.amount_remain -=  total_amount;
+//     investor_info.last_time_withdraw = time ;
+//     store_investor_info(deps.storage, &sender_addr_raw, &investor_info)?;
+//     let rcpt_addr = deps.api.addr_validate(&info.sender.to_string())?;
 
-    BALANCES.update(
-        deps.storage,
-        &rcpt_addr,
-        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + total_amount) },
-    )?;
+//     BALANCES.update(
+//         deps.storage,
+//         &rcpt_addr,
+//         |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + total_amount) },
+//     )?;
  
-     let res = Response::new()
-         .add_attribute("action", "claim")
-         .add_attribute("to", info.sender)
-         .add_attribute("amount", total_amount);
-     Ok(res)
- }
+//      let res = Response::new()
+//          .add_attribute("action", "claim")
+//          .add_attribute("to", info.sender)
+//          .add_attribute("amount", total_amount);
+//      Ok(res)
+//  }
 
 
 
@@ -1393,13 +1420,13 @@ pub fn query_investor_info(
 
     Ok(InvestorInfoResponse {
         investor:investor,
-        amount:investor_info.amount,
-        amount_remain:investor_info.amount_remain,
-        witdraw:investor_info.witdraw,
-        perday_amount:investor_info.perday_amount,
-        last_time_withdraw:investor_info.last_time_withdraw,
-        user_invest_time:investor_info.user_invest_time,
-        first_claim:investor_info.first_claim,
+        amount_given:investor_info.amount_given,
+        // amount_remain:investor_info.amount_remain,
+        // witdraw:investor_info.witdraw,
+        // perday_amount:investor_info.perday_amount,
+        // last_time_withdraw:investor_info.last_time_withdraw,
+        // user_invest_time:investor_info.user_invest_time,
+        // first_claim:investor_info.first_claim,
        
     })
 }
@@ -1586,14 +1613,14 @@ mod tests {
              investors:  vec![
                  InvestorInfo{
 
-                   amount:Uint128::new (10000000000000),
-                   witdraw: Uint128::zero(),
+                   amount_given:Uint128::new (10000000000000),
+                  // witdraw: Uint128::zero(),
                   investor: "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc".to_string(),
-                  amount_remain: Uint128::zero(),
-                  perday_amount: Uint128::zero(),
-                  user_invest_time: 0,
-                  last_time_withdraw: 0,
-                  first_claim:Uint128::zero(),
+                  //amount_remain: Uint128::zero(),
+                  //perday_amount: Uint128::zero(),
+                  //user_invest_time: 0,
+                  //last_time_withdraw: 0,
+                  //first_claim:Uint128::zero(),
                  }
              ]
                 
