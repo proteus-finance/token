@@ -53,6 +53,8 @@ pub enum Cw20ExecuteMsg {
      amount:Uint128,
     },
 
+    Claim{},
+
 
     TransferLuna{
         amount:Uint128,
@@ -104,11 +106,11 @@ pub enum Cw20ExecuteMsg {
 pub struct InvestorInfo {
     pub investor:String,
     pub amount_given: Uint128,
-    // pub witdraw:Uint128,
-    // pub last_time_withdraw:u64,
-    // pub amount_remain:Uint128,
-    // pub perday_amount:Uint128,
-    // pub user_invest_time:u64,
-    // pub first_claim:Uint128,
+    pub witdraw:Uint128,
+    pub last_time_withdraw:u64,
+    pub amount_remain:Uint128,
+    pub user_invest_time:u64,
+    pub first_claim:Uint128,
+    pub perday_amount:Uint128,
 
 }
