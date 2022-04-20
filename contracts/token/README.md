@@ -110,28 +110,14 @@ Seed Json
   "seed": {
     "investors": [
       {
-        "witdraw": "0",
+        "amount": "10,
         "investor": "terra1qtlhyyppjhm0305kx6eh78fapmupj4yt95fmqc",
-        "first_claim": "5",
-        "amount_given": "20",
-        "amount_remain": "0",
-        "perday_amount": "0",
-        "user_invest_time": 0,
-        "last_time_withdraw": 0
       }
     ]
   }
 }
 ```
-## Claim 
-- investor can claim daily linear vesting,
-- special investor can claim 7.5 % (or how much amount owner given) in first claim.
 
-```sh
-{
-  "claim": {}
-}
-```
 
 ## Public
 
